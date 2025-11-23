@@ -5,850 +5,475 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>ArtistHub - Discover Art & Artists</title>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Mali (ลายมือไทยน่ารักๆ) + Bai Jamjuree (โมเดิร์น) + Caveat (ลายมืออังกฤษ) -->
   <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&family=Caveat:wght@400;700&family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-  <!-- Markdown Parser for AI Response -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
     :root {
-      /* --- ชุดสี Dreamy Studio (ละมุน ฟุ้งฝัน) --- */
-      --primary: #FF9A9E;       /* ชมพูพีชละมุน */
-      --secondary: #A18CD1;     /* ม่วงลาเวนเดอร์ */
-      --accent: #84FAB0;        /* เขียวมินต์สดชื่น */
-      --text-main: #2D3436;     /* สีเทาเข้ม */
-      --text-muted: #636E72;    /* สีเทากลาง */
-      --bg-body: #FDFBF7;       /* สีครีมอ่อนๆ (Warm White) */
+      /* --- Original Color Palette --- */
+      --primary: #FF9A9E;       
+      --secondary: #A18CD1;     
+      --accent: #84FAB0;        
+      --text-main: #2D3436;     
+      --text-muted: #636E72;    
+      --bg-body: #FDFBF7;       
       
-      /* --- Shadows (นุ่มนวลขึ้น) --- */
-      --shadow-card: 0 8px 25px rgba(161, 140, 209, 0.1);
-      --shadow-hover: 0 15px 40px rgba(161, 140, 209, 0.2);
+      /* --- Enhanced UI Variables --- */
+      --glass-bg: rgba(255, 255, 255, 0.75);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+      --glass-highlight: 1px solid rgba(255, 255, 255, 0.9);
+      --shadow-soft: 0 10px 30px -5px rgba(161, 140, 209, 0.15);
+      --shadow-hover: 0 20px 40px -5px rgba(161, 140, 209, 0.25);
+      --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
     }
 
     body {
       font-family: 'Bai Jamjuree', sans-serif;
       background-color: var(--bg-body);
       color: var(--text-main);
-      line-height: 1.7;
+      line-height: 1.8;
       overflow-x: hidden;
-      /* Texture กระดาษร้อยปอนด์ */
-      background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      
+      /* --- [MODIFIED] Artistic Pastel Background --- */
+      background:
+        radial-gradient(at 18% 23%, #fff5e6 0px, transparent 50%),
+        radial-gradient(at 85% 15%, #ffe3e8 0px, transparent 50%),
+        radial-gradient(at 54% 47%, #e3d7ff 0px, transparent 50%),
+        radial-gradient(at 22% 83%, #d6f5ff 0px, transparent 50%),
+        radial-gradient(at 74% 78%, #e8ffe3 0px, transparent 50%),
+        linear-gradient(135deg, #fdfbf7 0%, #fff 100%);
+      background-attachment: fixed;
+      background-size: 200% 200%;
+      animation: gradientMove 15s ease infinite;
     }
 
-    h1, h2, h3, h4, h5, h6, .navbar-brand, .section-title {
+    /* --- [NEW] Background Animation Keyframes --- */
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* 3D Background Canvas */
+    #canvas-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1; pointer-events: none; opacity: 1; /* ปรับ Opacity ให้ชัดขึ้นเล็กน้อยเพราะพื้นหลังนวลแล้ว */
+    }
+
+    h1, h2, h3, h4, h5, h6, .navbar-brand, .section-title, .artist-name, .post-it {
       font-family: 'Mali', cursive;
       font-weight: 700;
     }
-    
-    .artist-name, .post-it {
-      font-family: 'Mali', cursive;
-    }
 
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-track { background: #fff; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.5); backdrop-filter: blur(4px); }
     ::-webkit-scrollbar-thumb { 
-      background: linear-gradient(to bottom, var(--primary), var(--secondary)); 
-      border-radius: 5px; 
-      border: 2px solid #fff;
+      background: var(--gradient-primary); 
+      border-radius: 10px; 
+      border: 3px solid transparent;
+      background-clip: content-box;
     }
-    ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+    ::-webkit-scrollbar-thumb:hover { background-color: var(--secondary); }
 
-    /* --- Enhanced Morphing Blobs (ปรับสีให้เข้าธีม) --- */
-    .bg-paint {
-      position: fixed;
-      z-index: -1;
-      filter: blur(60px); /* เบลอมากขึ้นให้ดูฟุ้ง */
-      opacity: 0.5;
-      animation: morph 20s ease-in-out infinite alternate;
-      will-change: border-radius, transform;
-    }
-    .paint-1 {
-      top: -15%; left: -10%; width: 60vw; height: 60vw;
-      background: radial-gradient(circle, #fad0c4 0%, rgba(255, 209, 255, 0) 70%);
-      animation-delay: 0s;
-    }
-    .paint-2 {
-      bottom: -10%; right: -10%; width: 55vw; height: 55vw;
-      background: radial-gradient(circle, #a18cd1 0%, rgba(251, 194, 235, 0) 70%);
-      animation-delay: -5s;
-    }
-    .paint-3 {
-      top: 40%; left: 30%; width: 40vw; height: 40vw;
-      background: radial-gradient(circle, #84fab0 0%, rgba(143, 211, 244, 0) 70%);
-      animation-delay: -10s;
-      opacity: 0.4;
-    }
-
-    @keyframes morph {
-      0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(0, 0) rotate(0deg); }
-      50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: translate(30px, -30px) rotate(10deg); }
-      100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(-30px, 30px) rotate(-10deg); }
-    }
-
-    /* --- Utilities --- */
-    a { text-decoration: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-    
-    /* Elastic Card Style */
+    /* --- Glassmorphism Cards --- */
     .glass-panel {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.5);
-      box-shadow: var(--shadow-card);
-      border-radius: 24px;
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Elastic Effect */
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(120%);
+      -webkit-backdrop-filter: blur(20px) saturate(120%);
+      border: var(--glass-border);
+      border-top: var(--glass-highlight);
+      box-shadow: var(--shadow-soft);
+      border-radius: 32px;
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
     }
     .glass-panel:hover {
-      transform: translateY(-8px) scale(1.01);
+      transform: translateY(-5px);
       box-shadow: var(--shadow-hover);
-      border-color: var(--secondary);
     }
-    
+
+    /* Section Titles */
     .section-title {
-      font-size: 2.5rem;
-      color: var(--text-main);
-      margin-bottom: 2rem;
+      font-size: 2.8rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
       position: relative;
       display: inline-block;
-      z-index: 1;
-    }
-    .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: 5px; left: -5px; right: -10px; height: 12px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      z-index: -1;
-      opacity: 0.4;
-      border-radius: 20px;
-      transform: rotate(-1deg);
-      transition: width 0.5s ease;
-    }
-    .section-title:hover::after { transform: rotate(1deg) scale(1.05); opacity: 0.6; }
-    
-    .badge-custom {
-      background: #fff;
-      color: var(--text-main);
-      border: 1px solid var(--secondary);
-      padding: 5px 15px;
-      border-radius: 50px;
-      font-family: 'Mali', cursive;
-      font-size: 0.8rem;
-      font-weight: 600;
-      transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .badge-custom:hover {
-      background: var(--secondary);
-      color: #fff;
-      transform: scale(1.1);
-      box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4);
+      text-shadow: 3px 3px 0px rgba(255,255,255,0.5);
     }
 
     /* --- Navbar --- */
     .navbar {
       background: rgba(255, 255, 255, 0.8) !important;
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(24px);
       border-bottom: 1px solid rgba(255,255,255,0.5);
-      padding: 0.8rem 0;
+      padding: 1rem 0;
       transition: all 0.4s ease;
     }
-    .navbar-brand {
-      font-size: 1.8rem;
-      color: var(--text-main) !important;
-      letter-spacing: -0.5px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: transparent; 
-    }
-    /* Logo Styling (Updated for better fit) */
-    .navbar-brand img {
-      height: 45px; /* ปรับความสูงให้พอดีกับ Navbar */
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 2px 4px rgba(161, 140, 209, 0.3));
-      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .navbar-brand:hover img {
-      transform: scale(1.1) rotate(-3deg);
-    }
+    .navbar-brand img { height: 48px; transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .navbar-brand:hover img { transform: scale(1.1) rotate(5deg); }
     .brand-text {
-        background: linear-gradient(45deg, var(--primary), var(--secondary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px;
     }
-    
     .nav-link {
       color: var(--text-muted) !important;
-      font-weight: 600;
-      margin: 0 0.5rem;
-      padding: 0.5rem 1.2rem !important;
-      border-radius: 20px;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-weight: 700; border-radius: 50px; padding: 0.6rem 1.5rem !important; margin: 0 4px;
+      transition: all 0.3s ease; font-size: 0.95rem;
     }
-    .nav-link:hover {
-      background: rgba(161, 140, 209, 0.1);
-      color: var(--secondary) !important;
-      transform: translateY(-2px);
-    }
+    .nav-link:hover { color: var(--primary) !important; background: rgba(255, 154, 158, 0.08); transform: translateY(-2px); }
     .nav-link.active {
-      background: var(--secondary);
+      background: var(--gradient-primary);
       color: #fff !important;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(161, 140, 209, 0.3);
+      box-shadow: 0 4px 15px rgba(161, 140, 209, 0.4);
     }
     .btn-contact {
-      background: linear-gradient(45deg, var(--primary), var(--secondary));
-      color: #fff !important;
-      border-radius: 50px;
-      border: none;
-      padding: 0.6rem 1.8rem !important;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 5px 15px rgba(161, 140, 209, 0.3);
+      background: var(--text-main);
+      color: #fff !important; border-radius: 50px; border: none;
+      padding: 0.7rem 2rem !important; transition: 0.4s;
+      font-family: 'Bai Jamjuree'; font-weight: 600;
     }
     .btn-contact:hover {
-      transform: scale(1.08);
-      box-shadow: 0 10px 25px rgba(161, 140, 209, 0.5);
+      background: var(--secondary); transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(161, 140, 209, 0.4);
     }
 
     /* --- Hero Section --- */
-    .hero { padding-top: 140px; padding-bottom: 80px; }
-
+    .hero { padding-top: 160px; padding-bottom: 100px; }
     .hero-profile-container {
-      position: relative;
-      width: 100%; height: 100%; min-height: 480px;
-      border-radius: 40px 40px 40px 4px;
-      overflow: hidden;
-      box-shadow: 20px 20px 60px rgba(161, 140, 209, 0.2);
-      border: 5px solid #fff;
+      position: relative; width: 100%; height: 100%; min-height: 520px;
+      border-radius: 48px; overflow: hidden;
+      box-shadow: var(--shadow-hover); border: 8px solid #fff;
       transition: transform 0.5s ease;
     }
-    .hero-profile-container:hover { transform: translateY(-5px) rotate(1deg); }
-    /* Hero Image Fitting (Updated) */
-    .hero-profile-container img {
-      width: 100%; height: 100%; 
-      object-fit: cover;
-      object-position: top center; /* เน้นให้เห็นหน้าศิลปินชัดเจน ไม่โดนตัดหัว */
-      transition: transform 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
-    .hero-profile-container:hover img { transform: scale(1.1); }
+    .hero-profile-container img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1); }
+    .hero-profile-container:hover img { transform: scale(1.08); }
     
-    .hero-profile-overlay {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      background: linear-gradient(to top, rgba(255,255,255,0.95) 20%, rgba(255,255,255,0.6) 60%, transparent 100%);
-      padding: 3rem 2rem 2rem;
-      color: var(--text-main);
-      backdrop-filter: blur(5px);
-    }
-
-     /* --- New Hero Info Card Design --- */
     .hero-info-card {
-        position: absolute;
-        bottom: 20px; 
-        left: 20px; 
-        right: 20px;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 24px;
-        padding: 1.8rem;
-        box-shadow: 0 15px 40px rgba(161, 140, 209, 0.25);
-        border: 1px solid rgba(255,255,255,1);
-        text-align: left;
-        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        z-index: 2;
+        position: absolute; bottom: 25px; left: 25px; right: 25px;
+        background: rgba(255, 255, 255, 0.92); border-radius: 30px; padding: 2rem;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 1px solid #fff;
+        backdrop-filter: blur(10px);
     }
-    
-    .hero-profile-container:hover .hero-info-card {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 60px rgba(161, 140, 209, 0.4);
+    .hero-card-title { 
+        font-family: 'Bai Jamjuree', sans-serif; font-weight: 800; font-size: 2.8rem; 
+        line-height: 0.95; margin: 10px 0; color: var(--text-main);
+        letter-spacing: -1px;
     }
+    .hero-desc-text i { color: var(--primary); margin-right: 5px; }
 
-    .hero-card-badge {
-        background: linear-gradient(45deg, #FF9A9E, #FECFEF);
-        color: #fff;
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 4px 12px;
-        border-radius: 20px;
-        display: inline-block;
-        margin-bottom: 10px;
-        box-shadow: 0 4px 10px rgba(255, 154, 158, 0.4);
-        letter-spacing: 0.5px;
-    }
-
-    .hero-card-title {
-        font-family: 'Bai Jamjuree', sans-serif;
-        font-weight: 700;
-        font-size: 2.4rem;
-        line-height: 1;
-        margin-bottom: 8px;
-        color: var(--text-main);
-    }
-    
-    .hero-card-desc {
-        font-size: 0.95rem;
-        color: var(--text-muted);
-        margin: 0;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    
     /* --- Bento Grid --- */
-    .bento-grid {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr; 
-      grid-template-rows: 180px 180px;
-      gap: 18px;
+    .bento-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; grid-template-rows: 190px 190px; gap: 20px; }
+    .bento-item { 
+        border-radius: 30px; overflow: hidden; position: relative; background: #fff; 
+        box-shadow: var(--shadow-soft); cursor: pointer;
+        transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .bento-item {
-      border-radius: 24px; overflow: hidden; position: relative;
-      background: #fff;
-      box-shadow: var(--shadow-card);
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      opacity: 0; animation: fadeScaleIn 0.6s forwards;
-    }
-    /* Staggered Animation Delays */
-    .bento-item:nth-child(1) { animation-delay: 0.1s; }
-    .bento-item:nth-child(2) { animation-delay: 0.2s; }
-    .bento-item:nth-child(3) { animation-delay: 0.3s; }
-    .bento-item:nth-child(4) { animation-delay: 0.4s; }
-
-    @keyframes fadeScaleIn {
-      from { opacity: 0; transform: scale(0.9) translateY(20px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .bento-item:hover { 
-      transform: translateY(-8px) scale(1.02); 
-      box-shadow: var(--shadow-hover); 
-      z-index: 2; 
-    }
-    /* ปรับ CSS เริ่มต้นให้เป็น center ก่อน แล้วเดี๋ยวใช้ JS คุมรายตัว */
-    .bento-item img { 
-        width: 100%; height: 100%; 
-        object-fit: cover; 
-        object-position: center center; /* Default เป็น Center */
-        transition: object-position 0.5s ease, transform 0.8s ease; /* เพิ่ม transition ให้ object-position */
-    }
+    .bento-item:hover { transform: scale(1.03) translateY(-5px); z-index: 10; box-shadow: var(--shadow-hover); }
+    .bento-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+    .bento-item:hover img { transform: scale(1.1); }
     .bento-item.large-vertical { grid-column: 1 / 2; grid-row: 1 / 3; }
     .bento-item.wide-horizontal { grid-column: 2 / 4; grid-row: 2 / 3; }
-    
 
-    /* Text Animations */
-    .bento-content-fade { opacity: 0.4 !important; filter: blur(3px) grayscale(80%); transform: scale(0.98); transition: all 0.5s ease; }
-
-    /* --- Artist Sidebar --- */
+    /* --- Sidebar & Artist List (Styled) --- */
     .artist-sidebar { 
-      padding: 1.8rem; height: 100%; 
-      display: flex; flex-direction: column;
-      background: rgba(255,255,255,0.6);
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.8);
+        padding: 2rem; height: 100%; display: flex; flex-direction: column; 
+        background: rgba(255,255,255,0.85); border-radius: 32px; 
+        border: 1px solid #fff; box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(15px);
     }
-    
     .filter-chip {
-      background: #fff; color: var(--text-muted);
-      border: 1px solid #eee;
-      border-radius: 50px; padding: 6px 16px;
-      font-size: 0.85rem; font-weight: 600; cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      font-family: 'Mali', cursive;
+      border: 1px solid #eee; border-radius: 50px; padding: 8px 18px; font-size: 0.9rem;
+      background: #fff; transition: 0.3s; cursor: pointer; font-family: 'Mali'; font-weight: 700; color: var(--text-muted);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
-    .filter-chip:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-3px); }
+    .filter-chip:hover { border-color: var(--secondary); color: var(--secondary); transform: translateY(-2px); }
     .filter-chip.active {
-      background: linear-gradient(45deg, var(--secondary), var(--primary));
-      color: #fff;
-      border: none;
-      box-shadow: 0 8px 20px rgba(161, 140, 209, 0.3);
-      transform: scale(1.05);
+      background: var(--gradient-primary); color: #fff; border: 1px solid transparent;
+      box-shadow: 0 8px 15px rgba(255, 154, 158, 0.4); transform: scale(1.05);
     }
 
     .artist-btn {
-      display: flex; align-items: center; gap: 1rem;
-      width: 100%; border: none;
-      background: rgba(255,255,255,0.5);
-      padding: 14px; margin-bottom: 10px;
-      border-radius: 18px;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      text-align: left; cursor: pointer;
-      border: 1px solid transparent;
-      transform-origin: left center;
+      display: flex; align-items: center; gap: 1.2rem; width: 100%; border: none;
+      background: #fff; padding: 12px 15px; margin-bottom: 12px;
+      border-radius: 24px; transition: all 0.3s; text-align: left; cursor: pointer;
+      border: 1px solid transparent; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
-    .artist-btn:hover { background: #fff; border-color: var(--accent); transform: translateX(10px) scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .artist-btn:hover { 
+        transform: translateX(8px); 
+        box-shadow: 0 8px 20px rgba(161, 140, 209, 0.15); 
+        border-color: var(--accent);
+    }
     .artist-btn.active {
-      background: #fff;
-      border-left: 4px solid var(--primary);
-      box-shadow: 0 8px 25px rgba(161, 140, 209, 0.15);
-      transform: translateX(10px);
+      background: #fff; border: 2px solid var(--primary);
+      box-shadow: 0 8px 25px rgba(255, 154, 158, 0.2);
     }
-    .artist-btn.active .artist-name { color: var(--secondary); }
-    .artist-name { color: var(--text-main); font-weight: 600; font-size: 1.1rem; transition: 0.2s;}
-    /* Artist Avatar Fitting (Updated) */
-    .artist-avatar {
-      width: 54px; height: 54px; border-radius: 50%;
-      object-fit: cover; 
-      object-position: top center; /* เน้นใบหน้า */
-      border: 3px solid #fff;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: transform 0.4s ease;
+    .artist-btn.active .artist-name { color: var(--secondary); background: -webkit-linear-gradient(0deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .artist-avatar { 
+        width: 56px; height: 56px; border-radius: 50%; object-fit: cover; 
+        object-position: top center;
+        border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
-    .artist-btn:hover .artist-avatar { transform: rotate(10deg); }
-    .artist-info-sm { font-size: 0.8rem; color: var(--text-muted); }
+    .artist-btn:hover .artist-avatar { transform: rotate(15deg) scale(1.1); }
+    .artist-group-header { 
+        color: var(--text-main); font-weight: 800; font-size: 1rem; letter-spacing: 1px;
+        margin: 1.5rem 0 0.8rem 0; padding-left: 15px; 
+        border-left: 5px solid var(--secondary);
+        background: linear-gradient(90deg, rgba(255,255,255,0.6), transparent);
+        border-radius: 0 15px 15px 0; padding-top: 5px; padding-bottom: 5px;
+    }
 
-    .artist-group-header {
-        color: var(--text-main); font-weight: 700; font-size: 0.9rem;
-        margin: 1.5rem 0 0.5rem 0; padding-left: 12px;
-        border-left: 4px solid var(--secondary);
-        background: linear-gradient(90deg, rgba(255,255,255,0.5), transparent);
-        border-radius: 0 10px 10px 0;
+    /* --- Detail View --- */
+    .detail-photo-container { 
+        position: relative; border-radius: 28px; padding: 10px; background: #fff; 
+        box-shadow: var(--shadow-soft); margin-bottom: 2.5rem; 
+        transform: rotate(-1deg); transition: all 0.5s; 
     }
-    .artist-group-header.hidden, .artist-btn.hidden, .expo-col.hidden { display: none !important; }
-
-    /* --- Artist Detail --- */
-    .detail-photo-container {
-      position: relative; 
-      border-radius: 20px; 
-      padding: 12px;
-      background: #fff;
-      box-shadow: 0 10px 20px rgba(161, 140, 209, 0.2), 0 0 0 1px rgba(255,255,255,0.5);
-      margin-bottom: 2.5rem;
-      transform: rotate(-2deg);
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .detail-photo-container:hover { transform: rotate(0deg) scale(1.01) translateY(-5px); z-index: 10; }
+    .detail-photo-inner { 
+        border-radius: 24px; overflow: hidden; height: 480px; position: relative;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; background: #f8f9fa;
     }
-    .detail-photo-container:hover { 
-      transform: rotate(0deg) scale(1.02) translateY(-5px); 
-      box-shadow: 0 20px 50px rgba(161, 140, 209, 0.4);
-      z-index: 10;
+    .detail-photo { width: auto; height: 100%; max-width: 100%; object-fit: cover; }
+    .detail-photo-overlay { 
+        position: absolute; bottom: 20px; left: 20px; right: 20px; 
+        background: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 24px; 
+        backdrop-filter: blur(15px); text-align: center; border: 1px solid #fff;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     
-    .detail-photo-inner {
-      position: relative;
-      width: 100%;
-      height: 450px;
-      border-radius: 16px;
-      overflow: hidden;
+    .detail-bio-box { 
+        background: rgba(255,255,255,0.6); border-radius: 24px; padding: 2.5rem; 
+        max-height: 350px; overflow-y: auto; margin-bottom: 2rem; 
+        border-left: 5px solid var(--primary); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
     }
 
-    .detail-photo { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-      object-position: top; /* เน้นใบหน้าในรูปรายละเอียด */
-      transition: transform 0.8s ease; 
+    .video-card { 
+        border-radius: 20px; overflow: hidden; background: #fff; position: relative; 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: all 0.4s; border: 4px solid #fff; cursor: pointer; 
     }
-    .detail-photo-container:hover .detail-photo { 
-      transform: scale(1.1); 
+    .video-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 35px rgba(161, 140, 209, 0.25); }
+    .video-card img { width: 100%; height: 150px; object-fit: cover; }
+
+    /* --- Radio Globe UI --- */
+    .radio-panel {
+        background: linear-gradient(145deg, #2d3436 0%, #1e272e 100%);
+        color: white; border: none; border-radius: 32px; overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4); position: relative;
     }
+    .radio-panel::before {
+        content: ''; position: absolute; inset: 0;
+        background: url('data:image/svg+xml,%3Csvg width="20" height="20" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1 1h1v1H1V1z" fill="rgba(255,255,255,0.05)"/%3E%3C/svg%3E');
+        opacity: 0.3; pointer-events: none;
+    }
+    .globe-container {
+      width: 320px; height: 320px; margin: 0 auto;
+      border-radius: 50%; background: #000;
+      box-shadow: 0 0 50px rgba(108, 92, 231, 0.3), inset 0 0 60px rgba(0,0,0,0.9);
+      cursor: grab; position: relative;
+    }
+    .globe-container:active { cursor: grabbing; transform: scale(0.98); }
     
-    .detail-photo-overlay {
-      position: absolute; 
-      bottom: 15px; 
-      left: 15px; 
-      right: 15px;
-      background: rgba(255, 255, 255, 0.85);
-      padding: 1.5rem;
-      border-radius: 16px;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.8);
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-      text-align: center;
+    .radio-item { 
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        color: #dfe6e9; margin-bottom: 8px; border-radius: 16px !important;
+        transition: 0.2s;
+    }
+    .radio-item:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); color: #fff; }
+    .radio-item.active { 
+        background: linear-gradient(90deg, rgba(108, 92, 231, 0.8), rgba(108, 92, 231, 0.4));
+        border-color: #a29bfe; color: #fff; font-weight: bold;
     }
 
-    .detail-bio-box {
-      background: rgba(255,255,255,0.6);
-      border-radius: 24px;
-      padding: 2.5rem; font-size: 1.05rem; color: #555; line-height: 1.8;
-      max-height: 300px; overflow-y: auto; margin-bottom: 2rem;
-      box-shadow: inset 0 0 20px rgba(255,255,255,0.5);
-      border: 1px solid rgba(255,255,255,0.5);
-      border-left: 5px solid var(--primary);
-    }
-    /* Additional styles for bio list */
-    .detail-bio-box ul { padding-left: 20px; margin-bottom: 15px; }
-    .detail-bio-box li { margin-bottom: 5px; }
-    .detail-bio-box strong { color: var(--secondary); font-weight: 700; }
-    .detail-bio-box h5 { color: var(--text-main); margin-top: 15px; margin-bottom: 10px; font-weight: 700; }
-
-    /* Improved Bio Animation */
-    .bio-anim { animation: popUp 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55) both; }
-    @keyframes popUp { 
-      from { opacity: 0; transform: scale(0.8) translateY(20px); } 
-      to { opacity: 1; transform: scale(1) translateY(0); } 
-    }
-
-    /* --- Video & Cards --- */
-    .video-card {
-      border-radius: 18px; overflow: hidden;
-      background: #fff; position: relative;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      border: 4px solid #fff;
-    }
-    .video-card:hover { transform: translateY(-8px) rotate(2deg); box-shadow: 0 15px 35px rgba(161, 140, 209, 0.2); }
-    .video-card img { width: 100%; height: 140px; object-fit: cover; transition: 0.4s; }
-    .play-icon {
-      width: 55px; height: 55px; background: #fff;
-      border-radius: 50%; color: var(--primary);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 8px 20px rgba(161, 140, 209, 0.3);
-      transition: transform 0.3s;
-    }
-    .video-card:hover .play-icon { transform: scale(1.2); color: var(--secondary); }
-    .play-overlay {
-        position: absolute; inset: 0; background: rgba(255,255,255,0.2);
-        display: flex; justify-content: center; align-items: center;
-        opacity: 0; transition: 0.3s;
-        backdrop-filter: blur(2px);
-    }
-    .video-card:hover .play-overlay { opacity: 1; }
-
-    /* --- AI Guru Section --- */
+    /* --- AI Chat --- */
     .ai-guru-container {
-      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
-      border-radius: 30px;
-      padding: 3rem;
-      box-shadow: var(--shadow-card);
-      border: 1px solid rgba(255,255,255,0.8);
-      position: relative;
-      overflow: hidden;
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        border: 1px solid #fff; border-radius: 32px; padding: 3rem;
+        box-shadow: var(--shadow-hover); position: relative; overflow: hidden;
     }
     .ai-guru-container::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 6px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: var(--gradient-primary);
     }
     .ai-chat-box {
-      background: #fff;
-      border-radius: 20px;
-      border: 1px solid #efeaf8;
-      min-height: 200px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      font-size: 1rem;
-      color: var(--text-main);
-      max-height: 400px;
-      overflow-y: auto;
+        background: #fff; border-radius: 24px; border: 1px solid #eee;
+        box-shadow: inset 0 0 30px rgba(0,0,0,0.02); padding: 20px;
     }
-    .ai-input-group {
-      display: flex;
-      gap: 10px;
-    }
-    .ai-input-group input {
-      flex: 1;
-      padding: 15px 25px;
-      border-radius: 50px;
-      border: 2px solid #efeaf8;
-      transition: all 0.3s;
-    }
-    .ai-input-group input:focus {
-      outline: none;
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 4px rgba(161, 140, 209, 0.1);
-    }
-    .btn-ai-send {
-      width: 55px; height: 55px;
-      border-radius: 50%;
-      background: var(--secondary);
-      color: #fff;
-      border: none;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.3s;
-      font-size: 1.2rem;
-    }
-    .btn-ai-send:hover {
-      transform: scale(1.1) rotate(10deg);
-      background: var(--primary);
-      box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
-    }
-    .typing-indicator {
-      display: inline-block;
-      font-style: italic;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
+    .ai-input-group input { border: 2px solid #eee; border-radius: 50px; padding: 15px 25px; transition: 0.3s; }
+    .ai-input-group input:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 4px rgba(161, 140, 209, 0.15); }
 
-    /* --- Post-it (Pastel Notes) --- */
-    .chat-board-container {
-      background: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,255,255,0.8);
-      border-radius: 30px; padding: 3rem;
-      min-height: 480px; overflow-y: auto;
-      box-shadow: var(--shadow-card);
+    /* --- Chat Board --- */
+    .chat-board-container { 
+        background: rgba(255,255,255,0.6); border-radius: 32px; padding: 3rem; 
+        min-height: 480px; overflow-y: auto; box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
+        border: 2px dashed rgba(161, 140, 209, 0.3);
     }
+    .post-it { 
+        width: 240px; min-height: 180px; padding: 1.8rem; 
+        background: #fff; color: #555; position: relative; 
+        box-shadow: 5px 8px 20px rgba(0,0,0,0.08); 
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        border-radius: 2px 2px 25px 2px; 
+        animation: floatIn 0.6s ease-out backwards; 
+    }
+    .post-it:hover { transform: scale(1.1) rotate(0deg) !important; z-index: 100; box-shadow: 20px 30px 50px rgba(161, 140, 209, 0.2); }
+    .post-it:nth-child(5n+1) { background: #ffe5d9; transform: rotate(-2deg); }
+    .post-it:nth-child(5n+2) { background: #e0c3fc; transform: rotate(2deg); }
+    .post-it:nth-child(5n+3) { background: #d0f4de; transform: rotate(-2deg); }
+    .post-it:nth-child(5n+4) { background: #a9def9; transform: rotate(1deg); }
+    .post-it:nth-child(5n+5) { background: #ffcfd2; transform: rotate(-1deg); }
     
-    .post-it {
-      width: 240px; min-height: 180px;
-      padding: 1.8rem;
-      background: #fff;
-      color: #555;
-      font-family: 'Mali', cursive; font-size: 1rem;
-      position: relative;
-      box-shadow: 5px 8px 15px rgba(0,0,0,0.05);
-      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-      animation: floatIn 0.6s ease-out backwards;
-      border-radius: 10px 10px 25px 5px;
+    /* --- Members --- */
+    .member-card { 
+      background: rgba(255, 255, 255, 0.85); border: 2px solid #fff; border-radius: 32px; 
+      padding: 3rem 2rem; text-align: center; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      box-shadow: var(--shadow-soft); backdrop-filter: blur(10px); position: relative; overflow: hidden;
     }
-    .post-it::before { 
-        content:''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-        width: 30px; height: 30px; background: rgba(255,255,255,0.8);
-        border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        border: 2px solid var(--secondary);
-    }
-    
-    .post-it:hover { 
-      transform: scale(1.15) rotate(0deg) !important; 
-      z-index: 100; 
-      box-shadow: 20px 30px 50px rgba(161, 140, 209, 0.2); 
-    }
-    
-    .post-it-meta {
-      font-size: 0.8rem; font-weight: 700; color: var(--secondary);
-      margin-bottom: 12px; border-bottom: 2px dashed rgba(0,0,0,0.08); padding-bottom: 5px;
-    }
-    
-    /* สีพาสเทลแบบใหม่ */
-    .post-it:nth-child(5n+1) { background: #ffe5d9; transform: rotate(-3deg); } /* Peach */
-    .post-it:nth-child(5n+2) { background: #e0c3fc; transform: rotate(2deg); }  /* Purple */
-    .post-it:nth-child(5n+3) { background: #d0f4de; transform: rotate(-2deg); } /* Mint */
-    .post-it:nth-child(5n+4) { background: #a9def9; transform: rotate(3deg); }  /* Blue */
-    .post-it:nth-child(5n+5) { background: #ffcfd2; transform: rotate(-1deg); } /* Rose */
-
-    @keyframes floatIn { 0% { opacity: 0; transform: translateY(50px) rotate(10deg); } 100% { opacity: 1; transform: translateY(0); } }
-
-    /* --- Exhibitions --- */
-    .expo-card {
-      background: #fff; border: none;
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      cursor: pointer;
-      border-radius: 24px;
-      box-shadow: var(--shadow-card);
-      border: 1px solid rgba(255,255,255,0.8);
-    }
-    .expo-card:hover {
-      transform: translateY(-15px);
-      box-shadow: 0 25px 50px rgba(161, 140, 209, 0.2);
-      border-color: var(--primary);
-    }
-    .expo-img-wrap { height: 220px; border-radius: 20px; overflow: hidden; margin-bottom: 1.2rem; position: relative; }
-    .expo-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s; }
-    .expo-card:hover .expo-img-wrap img { transform: scale(1.15); }
-    .expo-card h6 { font-size: 1.15rem; color: var(--text-main); font-weight: 700; }
-    
-    /* --- Member Cards --- */
-    .member-card {
-      background: rgba(255,255,255,0.7); 
-      border: 1px solid #fff;
-      border-radius: 24px; padding: 2.5rem;
-      text-align: center; transition: 0.4s;
-      box-shadow: var(--shadow-card);
-      backdrop-filter: blur(5px);
-    }
-    .member-card:hover {
-      transform: translateY(-10px);
-      box-shadow: var(--shadow-hover);
-      background: #fff;
-    }
-    
-    .member-avatar-placeholder {
-      width: 85px; height: 85px; margin: 0 auto 1.5rem;
-      border-radius: 50%;
+    .member-card:hover { transform: translateY(-15px); box-shadow: var(--shadow-hover); border-color: var(--secondary); }
+    .member-avatar-placeholder { 
+      width: 100px; height: 100px; margin: 0 auto 1.5rem; border-radius: 50%; 
       background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%); 
-      color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 2.2rem;
-      transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
-      font-family: 'Mali', cursive;
-      border: 4px solid #fff;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      color: #fff; display: flex; align-items: center; justify-content: center; 
+      font-weight: 800; font-size: 2.8rem; font-family: 'Mali', cursive; 
+      border: 5px solid #fff; box-shadow: 0 8px 20px rgba(161, 140, 209, 0.2); transition: 0.5s;
     }
-    .member-card:hover .member-avatar-placeholder {
-      transform: rotate(15deg) scale(1.1);
-      box-shadow: 0 10px 20px rgba(161, 140, 209, 0.3);
-    }
+    .member-card:hover .member-avatar-placeholder { transform: scale(1.1) rotate(10deg); background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%); }
 
-    /* --- Footer --- */
-    footer {
-      background: #fff;
-      border-top: 1px solid rgba(0,0,0,0.05);
-      padding: 5rem 0; margin-top: 6rem;
-      color: var(--text-muted);
-      position: relative;
-    }
-    footer::before {
-      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-    }
-    footer h5 { color: var(--text-main); font-family: 'Mali', cursive; }
-    footer a:hover { color: var(--secondary) !important; transform: translateX(3px); display: inline-block; }
-
-    /* --- Scroll Reveal Animation --- */
     .reveal { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .reveal.active { opacity: 1; transform: translateY(0); }
+    .hidden { display: none !important; }
     
-    /* Mobile Adjustments */
+    /* New: Ensure artist list always shows nicely */
+    #artistList { height: auto; max-height: none !important; }
+
     @media (max-width: 768px) {
-       .hero-profile-container { min-height: 300px; border-radius: 24px; }
-       .bento-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 200px 120px 120px; gap: 10px;}
+       .hero-profile-container { min-height: 350px; border-radius: 32px; }
+       .bento-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 160px 120px 120px; gap: 12px;}
        .bento-item.large-vertical { grid-column: 1 / 3; grid-row: 1 / 2; }
        .bento-item.wide-horizontal { grid-column: 1 / 3; grid-row: 3 / 4; }
-       .section-title { font-size: 2rem; }
-       .navbar-brand { font-size: 1.4rem; }
-       .navbar-brand img { height: 40px; }
+       .section-title { font-size: 2.2rem; }
+       .globe-container { width: 240px; height: 240px; }
     }
   </style>
 </head>
 
 <body>
 
-<!-- Decorative Paint Blobs -->
-<div class="bg-paint paint-1"></div>
-<div class="bg-paint paint-2"></div>
-<div class="bg-paint paint-3"></div>
+<div id="canvas-bg"></div>
 
-<!-- ========================= NAVBAR ========================= -->
 <nav class="navbar navbar-expand-lg fixed-top">
   <div class="container">
-    <a class="navbar-brand" href="#home">
+    <a class="navbar-brand animate__animated animate__fadeInLeft" href="#home">
       <img src="Logo SPU SIT_Color.png" alt="SPU SIT Logo">
-      <span class="brand-text">ArtistHub</span>
+      <span class="brand-text ms-2">ArtistHub</span>
     </a>
-
-    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-      <i class="bi bi-list fs-2 text-secondary"></i>
+    <button class="navbar-toggler border-0 shadow-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <div class="bg-secondary rounded-circle p-2 text-white"><i class="bi bi-list fs-4"></i></div>
     </button>
-
     <div id="nav" class="collapse navbar-collapse">
-      <ul class="navbar-nav ms-auto align-items-lg-center">
+      <ul class="navbar-nav ms-auto align-items-lg-center animate__animated animate__fadeInRight">
         <li class="nav-item"><a class="nav-link active" href="#home">หน้าหลัก</a></li>
         <li class="nav-item"><a class="nav-link" href="#artists">ศิลปิน</a></li>
-        <li class="nav-item"><a class="nav-link" href="#expos">อีเวนต์</a></li>
         <li class="nav-item"><a class="nav-link" href="#ai-guru">AI Guru</a></li>
+        <li class="nav-item"><a class="nav-link" href="#submit">เสนอรายชื่อ</a></li>
         <li class="nav-item"><a class="nav-link" href="#members">ผู้จัดทำ</a></li>
-        <li class="nav-item ms-lg-3">
-          <a class="nav-link btn-contact text-white" href="#submit">เสนอรายชื่อ</a>
-        </li>
       </ul>
     </div>
   </div>
 </nav>
 
-<!-- ========================= HERO SECTION ========================= -->
 <section id="home" class="hero container reveal">
   <div class="row g-5 align-items-stretch">
-    
     <div class="col-lg-4">
       <div class="hero-profile-container">
         <img id="hero-profile-img" src="https://mintmagth.s3.ap-southeast-1.amazonaws.com/photos/shares/Mint%20Story/2023/June%202023/Three%20Man%20Down%20Con/647c174726716.jpg" alt="Artist Profile">
-        
         <div class="hero-info-card">
            <div class="d-flex justify-content-between align-items-start">
-              <span class="hero-card-badge"><i class="bi bi-fire me-1"></i>Hot Pick</span>
-              <i class="bi bi-soundwave text-secondary fs-4"></i>
+              <span class="hero-card-badge shadow-sm"><i class="bi bi-fire me-1"></i>Hot Pick</span>
+              <i class="bi bi-soundwave text-secondary fs-3 animate__animated animate__pulse animate__infinite"></i>
            </div>
-           <h1 id="hero-title-html" class="hero-card-title">
-              Three Man <br><span style="color: var(--secondary);">Down</span>
-           </h1>
-           <p id="hero-desc-text" class="hero-card-desc">
-              <i class="bi bi-headphones text-primary"></i> วงป๊อปร็อกที่มาแรงที่สุดตอนนี้
-           </p>
+           <h1 id="hero-title-html" class="hero-card-title">Three Man <br><span style="color: var(--secondary);">Down</span></h1>
+           <p id="hero-desc-text" class="hero-card-desc mt-2"><i class="bi bi-headphones me-2"></i> วงป๊อปร็อกที่มาแรงที่สุดตอนนี้</p>
         </div>
-
       </div>
     </div>
-
     <div class="col-lg-8">
-      <div class="glass-panel p-4 h-100 d-flex flex-column justify-content-center" style="background: rgba(255,255,255,0.8);">
+      <div class="glass-panel p-4 h-100 d-flex flex-column justify-content-center" style="background: rgba(255,255,255,0.7);">
         <div class="bento-grid mb-0" id="bentoGrid">
-          <div class="bento-item large-vertical">
-             <!-- รูปที่ 1: ลิงก์ใหม่ -->
-             <img id="bento-img-1" src="https://i.ytimg.com/vi/bqQBTWViS1Q/maxresdefault.jpg" alt="Concert Highlight">
-          </div>
-          <div class="bento-item">
-             <!-- รูปที่ 2: ลิงก์ใหม่ -->
-             <img id="bento-img-2" src="https://mintmagth.s3.ap-southeast-1.amazonaws.com/photos/shares/Mint%20Story/2023/AUG%202023/Three%20Man%20Down%20Concert/64e4561744309.jpg" alt="Concert 1">
-          </div>
-          <div class="bento-item">
-             <!-- รูปที่ 3: ลิงก์ใหม่ -->
-             <img id="bento-img-3" src="https://admin.adaddictth.com/files/Cilent%202023/TMD/image12.png" alt="Concert 2">
-          </div>
-          <div class="bento-item wide-horizontal">
-             <!-- รูปที่ 4: ลิงก์ใหม่ -->
-             <img id="bento-img-4" src="https://i.ytimg.com/vi/nXtphDSQEEk/hq720.jpg?rs=AOn4CLBksiqvHJ_cDD-aykTpUF6UV3Ah3w&sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD" alt="Concert 3">
-          </div>
+          <div class="bento-item large-vertical"><img id="bento-img-1" src="https://i.ytimg.com/vi/bqQBTWViS1Q/maxresdefault.jpg" alt="Concert Highlight"></div>
+          <div class="bento-item"><img id="bento-img-2" src="https://mintmagth.s3.ap-southeast-1.amazonaws.com/photos/shares/Mint%20Story/2023/AUG%202023/Three%20Man%20Down%20Concert/64e4561744309.jpg" alt="Concert 1"></div>
+          <div class="bento-item"><img id="bento-img-3" src="https://admin.adaddictth.com/files/Cilent%202023/TMD/image12.png" alt="Concert 2"></div>
+          <div class="bento-item wide-horizontal"><img id="bento-img-4" src="https://i.ytimg.com/vi/nXtphDSQEEk/hq720.jpg?rs=AOn4CLBksiqvHJ_cDD-aykTpUF6UV3Ah3w&sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD" alt="Concert 3"></div>
         </div>
       </div>
     </div>
-
   </div>
 </section>
 
-<!-- ========================= ARTISTS SECTION ========================= -->
 <section id="artists" class="py-5 position-relative reveal">
   <div class="container">
-    
     <div class="d-flex justify-content-between align-items-end mb-5">
       <div>
-        <h2 class="section-title mb-1">ศิลปินแนะนำ</h2>
-        <p class="text-muted mb-0">ศิลปินที่มีผลงานโดดเด่นและน่าจับตามอง</p>
+        <h2 class="section-title mb-0" data-text="ศิลปินแนะนำ">ศิลปินแนะนำ</h2>
+        <p class="text-muted mt-2 mb-0 fs-5">ศิลปินที่มีผลงานโดดเด่นและน่าจับตามอง</p>
       </div>
-      <a id="artistToggle" href="#" class="btn btn-outline-dark rounded-pill px-4 py-2" style="border-color:#e0e0e0; background:#fff; color: var(--secondary);">ดูทั้งหมด <i class="bi bi-arrow-right"></i></a>
     </div>
-
     <div class="row g-4">
-      
       <div class="col-lg-4">
         <div class="artist-sidebar h-100">
           <div class="d-flex align-items-center mb-4 px-2">
-            <i class="bi bi-stars me-2 text-warning fs-4"></i>
-            <span class="fw-bold text-uppercase text-muted small" style="letter-spacing: 1px;">Directory</span>
+            <div class="bg-warning rounded-circle p-2 me-3 text-white shadow-sm"><i class="bi bi-stars fs-5"></i></div>
+            <span class="fw-bold text-uppercase text-muted" style="letter-spacing: 1.5px;">Directory</span>
           </div>
-
           <div class="d-flex flex-wrap gap-2 px-2 mb-4" id="artistFilters">
             <div class="filter-chip active" data-filter="all">ทั้งหมด</div>
-            <div class="filter-chip" data-filter="thai">ไทย</div>
-            <div class="filter-chip" data-filter="korea">เกาหลี</div>
-            <div class="filter-chip" data-filter="western">สากล</div>
-            <div class="filter-chip" data-filter="japan">ญี่ปุ่น</div>
+            <div class="filter-chip" data-filter="thai">🇹🇭 ไทย</div>
+            <div class="filter-chip" data-filter="korea">🇰🇷 เกาหลี</div>
+            <div class="filter-chip" data-filter="western">🇺🇸 สากล</div>
+            <div class="filter-chip" data-filter="japan">🇯🇵 ญี่ปุ่น</div>
           </div>
-
-          <div id="artistList" class="overflow-hidden pe-2" style="max-height: 450px; transition: max-height 0.6s ease-in-out;">
-            <!-- Content populated -->
-            <div class="artist-group-header" data-group="thai">🇹🇭 ศิลปินไทย</div>
-            <button class="artist-btn active" data-group="thai" data-name="Three Man Down" data-country="ไทย" data-style="Pop Rock" data-photo="https://mintmagth.s3.ap-southeast-1.amazonaws.com/photos/shares/Mint%20Story/2023/June%202023/Three%20Man%20Down%20Con/647c174726716.jpg" data-bio="<strong>ชื่อจริง:</strong> กฤตย์ จีรพัฒนานุวงศ์ (กิต), พีรพล เอี่ยมจำรัส (ตูน), เตธนันท์ วงศ์ปรีชาโชค (เต)<br><strong>แนวเพลง:</strong> Pop Rock<br><strong>ค่าย:</strong> Gene Lab<br><br><strong>ผลงานเด่น</strong><ul><li>ฝนตกไหม</li><li>ถ้าเธอรักฉันจริง</li><li>น้อง</li></ul>" data-extra='{"youtube":[{"title":"ฝนตกไหม - Official MV","url":"https://youtu.be/C0Xm4x4o5ng"}],"apple":[{"title":"Three Man Down","url":"https://music.apple.com/th/artist/three-man-down/1193225731"}]}'><img src="https://www.unlockmen.com/wp-content/uploads/2023/08/230811-Toon-Three-Man-Down-for-web-10.jpg" class="artist-avatar" alt=""><div><div class="artist-name">Three Man Down</div><div class="artist-info-sm">Thailand • Pop Rock</div></div></button>
-            <button class="artist-btn" data-group="thai" data-name="BOWKYLION" data-country="ไทย" data-style="Pop / Indie" data-photo="https://media.atime.live/content/c7a34615-d6a7-43ab-a59d-17b3bae0c99e.jpeg" data-bio="<strong>ชื่อจริง:</strong> พิชญ์สินี วีระสุทธิมาศ<br><strong>ชื่อเล่น:</strong> โบกี้<br><strong>เกิด:</strong> 8 มิถุนายน พ.ศ. 2537<br><strong>บ้านเกิด:</strong> กรุงเทพมหานคร<br><strong>การศึกษา:</strong> มหาวิทยาลัยธรรมศาสตร์<br><strong>ค่ายปัจจุบัน:</strong> What The Duck<br><br><h5>เส้นทางในวงการเพลง</h5><ul><li>เริ่มต้นจากการร้องคัฟเวอร์ลง YouTube</li><li>เข้าประกวด The Voice Thailand Season 1 (2555)</li><li>มีสไตล์อินดี้–ป๊อป เสียงร้องมีเอกลักษณ์</li></ul><h5>เพลงฮิต (บางส่วน)</h5><ul><li>คิดถึงแต่ (Just Wondering)</li><li>เพื่อนเล่น ไม่เล่นเพื่อน</li><li>วาดไว้</li><li>คงคา</li><li>ลงใจ</li><li>ท้องฟ้า</li></ul><h5>คอนเสิร์ต / งานแสดง (บางส่วน)</h5><ul><li>Bangkok Music Week 2024</li><li>BMM Live 2023</li><li>Songkran Fest 2022</li><li>JOOX Thailand Music Awards Showcases</li><li>Cat Expo หลายปี</li><li>Big Mountain Music Festival</li><li>งานมหาวิทยาลัยต่าง ๆ ทั่วประเทศ</li></ul>" data-extra='{"youtube":[{"title":"บานปลาย","url":"https://youtu.be/hW_K_r8WbV8"}],"apple":[{"title":"BOWKYLION","url":"https://music.apple.com/th/artist/bowkylion/1193225731"}]}'><img src="https://media.atime.live/content/c7a34615-d6a7-43ab-a59d-17b3bae0c99e.jpeg" class="artist-avatar" alt=""><div><div class="artist-name">BOWKYLION</div><div class="artist-info-sm">Thailand • Pop</div></div></button>
-            <button class="artist-btn" data-group="thai" data-name="NONT TANONT" data-country="ไทย" data-style="Pop / R&B" data-photo="https://upload.wikimedia.org/wikipedia/commons/7/7e/CoolpuiLiam191996.jpg" data-bio="<strong>ชื่อจริง:</strong> ธนนท์ จำเริญ<br><strong>ชื่อในวงการ:</strong> นนท์ ธนนท์ (NONT TANONT)<br><strong>สังกัด:</strong> LOVEiS Entertainment<br><strong>อาชีพ:</strong> นักร้อง / นักแสดง<br><strong>จุดเด่น:</strong> โทนเสียงอุ่น นุ่ม ละมุน ร้องสดดีมาก<br><br><strong>ผลงานสร้างชื่อ</strong><ul><li>ผู้ชนะ The Voice Thailand Season 1</li></ul><strong>เพลงดัง</strong><ul><li>คืนที่หมาเต็มวัด</li></ul><strong>คอลแลบเด่น</strong><ul><li>ที่คั่นหนังสือ (Sometimes) ร่วมกับ BOWKYLION</li></ul>" data-extra='{"youtube":[{"title":"ที่คั่นหนังสือ (Sometimes)","url":"https://www.youtube.com/watch?v=L051YSpEEYU"},{"title":"คืนที่หมาเต็มวัด","url":"https://www.youtube.com/watch?v=238wVBszibE"}],"apple":[{"title":"NONT TANONT","url":"https://music.apple.com/th/artist/nont-tanont/671377502?l=th"},{"title":"Nont Tanont Essentials","url":"https://music.apple.com/us/playlist/nont-tanont-essentials/pl.40e3d0f3d7934ec495502840ae57f190"}]}'><img src="https://www.sunshinefm.com/pix/whatsnews/tn-1961-902.jpg" class="artist-avatar" alt=""><div><div class="artist-name">NONT TANONT</div><div class="artist-info-sm">Thailand • Pop</div></div></button>
-            
-            <button class="artist-btn" data-group="thai" data-name="Ink Waruntorn" data-country="ไทย" data-style="Synth-Pop" data-photo="https://storage.googleapis.com/atime-media-prod/editor/content/244dd612-48f4-46a0-a7cb-673650a5ff76.jpeg" data-bio="<strong>ชื่อจริง:</strong> วรันธร เปานิล (Waruntorn Paonil)<br><strong>ชื่อในวงการ:</strong> Ink Waruntorn<br><strong>เกิด:</strong> 23 กุมภาพันธ์ 1994<br><strong>ภูมิลำเนา:</strong> กรุงเทพฯ<br><strong>แนวเพลง:</strong> R&B / Soul / Pop / Hip-Hop<br><strong>ค่าย:</strong> BOXX MUSIC<br><br><strong>เส้นทางดนตรี</strong><ul><li>เริ่มเดบิวต์ในวงการตั้งแต่ปี 2006</li><li>เป็นศิลปินเดี่ยวค่าย BOXX MUSIC ตั้งแต่ปี 2015</li><li>เสียงร้อง: ใส − นุ่ม − มีเอกลักษณ์</li></ul><strong>คอนเสิร์ต / งานแสดงที่น่าสนใจ</strong><ul><li>Secret Between Us Concert (2019)</li><li>Inksyland Concert (2022) - Impact Arena</li><li>Ink Waruntorn ‘Close Up’ Concert (2024)</li><li>มาม่า presents Ink Waruntorn สิบปีว่าไม่เท่าตาเห็น (2025)</li></ul>" data-extra='{"youtube":[{"title":"สายตาหลอกกันไม่ได้","url":"https://youtu.be/C2rD2h7OqI8"}],"apple":[{"title":"Ink Waruntorn","url":"https://music.apple.com/th/artist/ink-waruntorn/1068038828"}]}'><img src="https://yt3.googleusercontent.com/Fn6THjnRY5HNH6-Otij1SeOI5bR1ps993kGlmaUfoGJiuXvV5WJsSQBDDLeDJWG6hChy11jaZcA%3Ds900-c-k-c0x00ffffff-no-rj" class="artist-avatar" alt=""><div><div class="artist-name">Ink Waruntorn</div><div class="artist-info-sm">Thailand • Synth-Pop</div></div></button>
-            
-            <button class="artist-btn" data-group="thai" data-name="Sunnee (ซันนี่)" data-country="ไทย/จีน" data-style="C-Pop / R&B" data-photo="https://s.isanook.com/jo/0/ui/486/2433625/sunnee_press_image_04.jpg" data-bio="<strong>ชื่อจริง:</strong> Sunnee (Yang Yun-qing / 杨芸晴)<br><strong>เชื้อชาติ/พื้นเพ:</strong> จีน (เกิดที่ไทย มีเชื้อสายจีน)<br><strong>บ้านเกิด:</strong> กรุงเทพมหานคร ประเทศไทย<br><strong>สัญชาติ:</strong> จีน<br><strong>แนวเพลง:</strong> ป็อป, C-Pop, Mandopop<br><br><h5>เส้นทางในวงการ</h5><ul><li>เดบิวต์จากรายการเซอร์ไววัลจีน 'Produce 101 China'</li><li>เป็นหนึ่งในสมาชิกวงหญิง 'Rocket Girls 101'</li><li>มีผลงานเพลงเดี่ยวและงานแสดงในจีนและไต้หวัน</li></ul><h5>คอนเสิร์ต / งานแสดง (บางส่วน)</h5><ul><li>Rocket Girls 101 Concert Tours</li><li>งานแฟนมีตในจีนและประเทศอื่น ๆ</li><li>เวทีงานอีเวนต์ทางทีวีและออนไลน์ต่าง ๆ</li></ul>" data-extra='{"youtube":[{"title":"Sunnee MV","url":"https://youtu.be/5siJzY4rTVc"}],"apple":[{"title":"Sunnee","url":"https://music.apple.com/th/artist/sunnee%E6%9D%A8%E8%8A%B9%E6%99%B4/1825350744"}]}'><img src="https://s.isanook.com/jo/0/ui/486/2433625/sunnee_press_image_04.jpg" class="artist-avatar" alt=""><div><div class="artist-name">Sunnee</div><div class="artist-info-sm">Thai/China • C-Pop</div></div></button>
-            
-            <div class="artist-group-header" data-group="korea">🇰🇷 ศิลปินเกาหลี</div>
-            <button class="artist-btn" data-group="korea" data-name="Roseanne Park" data-country="เกาหลีใต้" data-style="K-Pop" data-photo="https://i.namu.wiki/i/fjnLZhByeJypmPtNpoH0W6BnJFw7l3AyZVH9LdhsQOdJWZS5jDSOCaE37ochEp4rvje_IgOfP1A36aMwcNvZcg.webp" data-bio="<strong>ชื่อจริง:</strong> พัก แชยอง (Park Chae-young)<br><strong>ชื่ออังกฤษ:</strong> Roseanne Park<br><strong>ชื่อในวงการ:</strong> ROSÉ (BLACKPINK)<br><br><ul><li>Main Vocalist ของ BLACKPINK</li><li>เดบิวต์เดี่ยวอัลบั้ม R (On The Ground, Gone)</li><li>Global Ambassador ของ Saint Laurent</li><li>มีเสียงร้องโทนหวาน–แหบเป็นเอกลักษณ์</li></ul>" data-extra='{"youtube":[{"title":"On The Ground","url":"https://youtu.be/CKZvWhCqx1s"}],"apple":[{"title":"ROSÉ","url":"https://music.apple.com/cd/artist/ros%C3%A9/1406242696"}]}'><img src="https://i.namu.wiki/i/fjnLZhByeJypmPtNpoH0W6BnJFw7l3AyZVH9LdhsQOdJWZS5jDSOCaE37ochEp4rvje_IgOfP1A36aMwcNvZcg.webp" class="artist-avatar" alt=""><div><div class="artist-name">Roseanne Park</div><div class="artist-info-sm">Korea • K-Pop</div></div></button>
-            
-            <div class="artist-group-header" data-group="western">🇺🇸 ศิลปินสากล</div>
-            <button class="artist-btn" data-group="western" data-name="Taylor Swift" data-country="USA" data-style="Pop / Country" data-photo="https://freight.cargo.site/t/original/i/e81c27bbe95fc33e5a72a3591bf94db6a7714c39ba290393489ff1ffcfc6a10c/MS_Swift_Taylor_CloseUp.jpg" data-bio="<strong>ชื่อจริง:</strong> Taylor Alison Swift<br><strong>เกิด:</strong> 13 ธันวาคม 1989 (West Reading, PA)<br><strong>สัญชาติ:</strong> อเมริกัน<br><br><h5>เส้นทางในวงการเพลง</h5><ul><li>เริ่มต้นจากแนวคันทรี่ในวัยรุ่น ก่อนเปลี่ยนสู่ป็อปเต็มตัว และอินดี้/โฟล์กในอัลบั้มหลังๆ</li><li>เป็นหนึ่งในศิลปินที่ทรงอิทธิพลที่สุดในยุคปัจจุบัน</li><li>อัลบั้ม <em>Fearless</em> (2008) สร้างชื่อเสียงอย่างมาก</li><li>อัลบั้ม <em>1989</em> (2014) คือจุดเปลี่ยนครั้งใหญ่สู่ป็อปสตาร์ระดับโลก</li></ul><h5>คอนเสิร์ต / งานแสดง</h5><ul><li><strong>The Eras Tour (2023–Present):</strong> ทัวร์ประวัติศาสตร์ที่ทำรายได้สูงสุดตลอดกาล ครอบคลุมบทเพลงจากทุกยุคของเธอ</li></ul>" data-extra='{"youtube":[{"title":"Shake It Off","url":"https://www.youtube.com/watch?v=nfWlot6h_JM"},{"title":"Blank Space","url":"https://www.youtube.com/watch?v=e-ORhEE9VVg"},{"title":"Anti-Hero","url":"https://www.youtube.com/watch?v=b1kbLwvqugk"},{"title":"Cruel Summer","url":"https://youtu.be/ic8j13piAhQ"}],"apple":[{"title":"Taylor Swift","url":"https://music.apple.com/us/artist/taylor-swift/159260351"},{"title":"Midnights","url":"https://music.apple.com/us/album/midnights/1645950184"}]}'><img src="https://freight.cargo.site/t/original/i/e81c27bbe95fc33e5a72a3591bf94db6a7714c39ba290393489ff1ffcfc6a10c/MS_Swift_Taylor_CloseUp.jpg" class="artist-avatar" alt=""><div><div class="artist-name">Taylor Swift</div><div class="artist-info-sm">USA • Pop</div></div></button>
-            
-            <div class="artist-group-header" data-group="japan">🇯🇵 ศิลปินญี่ปุ่น</div>
-            <button class="artist-btn" data-group="japan" data-name="ADO (อาโดะ)" data-country="ญี่ปุ่น" data-style="J-Rock / Pop" data-photo="https://cms.dmpcdn.com/musicarticle/2025/01/14/e5577330-d28d-11ef-af62-bbb29a1bba7c_webp_original.webp" data-bio="<strong>ชื่อจริง:</strong> ไม่เปิดเผย<br><strong>เกิด:</strong> 24 ตุลาคม ค.ศ. 2002<br><strong>สัญชาติ:</strong> ญี่ปุ่น<br><strong>บ้านเกิด:</strong> โตเกียว<br><strong>สังกัด:</strong> Universal Music Japan (Virgin Music)<br><br><h5>เส้นทางในวงการเพลง</h5><ul><li>เริ่มต้นจากการร้องเพลงคัฟเวอร์ลง Niconico ตั้งแต่อายุ 14</li><li>เดบิวต์อย่างเป็นทางการในปี 2020</li><li>เพลงเปิดตัว “Usseewa” กลายเป็นไวรัลทั่วญี่ปุ่น</li><li>เป็นผู้ให้เสียงร้องให้ตัวละคร “Uta” ใน One Piece Film: Red (2022)</li><li>มีสไตล์การร้องพลังสูง โทนดุดัน และเอกลักษณ์เฉพาะตัว</li></ul><h5>เพลงฮิต (บางส่วน)</h5><ul><li>Usseewa (うっせぇわ)</li><li>Gira Gira (ギラギラ)</li><li>Odo (踊)</li><li>Readymade</li><li>Shinjidai (New Genesis)</li><li>Backlight</li><li>Tot Musica</li><li>Ashura-chan</li></ul><h5>คอนเสิร์ต / งานแสดง (บางส่วน)</h5><ul><li>Ado 1st Live “Kagayaki”</li><li>Ado Live Tour 2022–2023</li><li>Ado Special Live 2024 “Break Through”</li><li>One Piece Film: Red Live Shows</li><li>Rock in Japan Festival</li><li>COUNTDOWN JAPAN</li><li>งานดนตรีใหญ่ในสเตเดียมทั่วญี่ปุ่น</li></ul>" data-extra='{"youtube":[{"title":"Usseewa","url":"https://youtu.be/Qp3b-RXtz4w"}],"apple":[{"title":"ADO","url":"https://music.apple.com/th/artist/ado/1492604670?l=th"}]}'><img src="https://cms.dmpcdn.com/musicarticle/2025/01/14/e5577330-d28d-11ef-af62-bbb29a1bba7c_webp_original.webp" class="artist-avatar" alt=""><div><div class="artist-name">ADO (อาโดะ)</div><div class="artist-info-sm">Japan • J-Pop</div></div></button>
+          
+          <div id="artistList" class="overflow-visible pe-2">
+             
+             <div class="artist-group-header" data-group="thai">🇹🇭 ศิลปินไทย</div>
+             <button class="artist-btn active" data-group="thai" data-name="Three Man Down" data-country="ไทย" data-style="Pop Rock" data-photo="https://mintmagth.s3.ap-southeast-1.amazonaws.com/photos/shares/Mint%20Story/2023/June%202023/Three%20Man%20Down%20Con/647c174726716.jpg" data-bio="<strong>ชื่อจริง:</strong> กฤตย์ จีรพัฒนานุวงศ์ (กิต), พีรพล เอี่ยมจำรัส (ตูน), เตธนันท์ วงศ์ปรีชาโชค (เต)<br><strong>แนวเพลง:</strong> Pop Rock<br><strong>ค่าย:</strong> Gene Lab<br><br><strong>ผลงานเด่น</strong><ul><li>ฝนตกไหม</li><li>ถ้าเธอรักฉันจริง</li><li>น้อง</li></ul>" data-extra='{"youtube":[{"title":"ฝนตกไหม - Official MV","url":"https://youtu.be/C0Xm4x4o5ng"}],"apple":[{"title":"Three Man Down","url":"https://music.apple.com/th/artist/three-man-down/1193225731"}]}'><img src="https://www.unlockmen.com/wp-content/uploads/2023/08/230811-Toon-Three-Man-Down-for-web-10.jpg" class="artist-avatar" alt=""><div><div class="artist-name">Three Man Down</div><div class="artist-info-sm">Thailand • Pop Rock</div></div></button>
+             
+             <button class="artist-btn" data-group="thai" data-name="BOWKYLION" data-country="ไทย" data-style="Pop / Indie" data-photo="https://media.atime.live/content/c7a34615-d6a7-43ab-a59d-17b3bae0c99e.jpeg" data-bio="<strong>ชื่อจริง:</strong> พิชญ์สินี วีระสุทธิมาศ<br><strong>ชื่อเล่น:</strong> โบกี้<br><strong>เกิด:</strong> 8 มิถุนายน พ.ศ. 2537<br><strong>บ้านเกิด:</strong> กรุงเทพมหานคร<br><strong>การศึกษา:</strong> มหาวิทยาลัยธรรมศาสตร์<br><strong>ค่ายปัจจุบัน:</strong> What The Duck<br><br><h5>เส้นทางในวงการเพลง</h5><ul><li>เริ่มต้นจากการร้องคัฟเวอร์ลง YouTube</li><li>เข้าประกวด The Voice Thailand Season 1 (2555)</li><li>มีสไตล์อินดี้–ป๊อป เสียงร้องมีเอกลักษณ์</li></ul><h5>เพลงฮิต (บางส่วน)</h5><ul><li>คิดถึงแต่ (Just Wondering)</li><li>เพื่อนเล่น ไม่เล่นเพื่อน</li><li>วาดไว้</li><li>คงคา</li><li>ลงใจ</li><li>ท้องฟ้า</li></ul>" data-extra='{"youtube":[{"title":"บานปลาย","url":"https://youtu.be/hW_K_r8WbV8"}],"apple":[{"title":"BOWKYLION","url":"https://music.apple.com/th/artist/bowkylion/1193225731"}]}'><img src="https://media.atime.live/content/c7a34615-d6a7-43ab-a59d-17b3bae0c99e.jpeg" class="artist-avatar" alt=""><div><div class="artist-name">BOWKYLION</div><div class="artist-info-sm">Thailand • Pop</div></div></button>
+             
+             <button class="artist-btn" data-group="thai" data-name="NONT TANONT" data-country="ไทย" data-style="Pop / R&B" data-photo="https://upload.wikimedia.org/wikipedia/commons/7/7e/CoolpuiLiam191996.jpg" data-bio="<strong>ชื่อจริง:</strong> ธนนท์ จำเริญ<br><strong>ชื่อในวงการ:</strong> นนท์ ธนนท์ (NONT TANONT)<br><strong>สังกัด:</strong> LOVEiS Entertainment<br><strong>อาชีพ:</strong> นักร้อง / นักแสดง<br><strong>จุดเด่น:</strong> โทนเสียงอุ่น นุ่ม ละมุน ร้องสดดีมาก<br><br><strong>ผลงานสร้างชื่อ</strong><ul><li>ผู้ชนะ The Voice Thailand Season 1</li></ul><strong>เพลงดัง</strong><ul><li>คืนที่หมาเต็มวัด</li></ul>" data-extra='{"youtube":[{"title":"ที่คั่นหนังสือ (Sometimes)","url":"https://www.youtube.com/watch?v=L051YSpEEYU"},{"title":"คืนที่หมาเต็มวัด","url":"https://www.youtube.com/watch?v=238wVBszibE"}],"apple":[{"title":"NONT TANONT","url":"https://music.apple.com/th/artist/nont-tanont/671377502?l=th"}]}'><img src="https://www.sunshinefm.com/pix/whatsnews/tn-1961-902.jpg" class="artist-avatar" alt=""><div><div class="artist-name">NONT TANONT</div><div class="artist-info-sm">Thailand • Pop</div></div></button>
+             
+             <button class="artist-btn" data-group="thai" data-name="Ink Waruntorn" data-country="ไทย" data-style="Synth-Pop" data-photo="https://storage.googleapis.com/atime-media-prod/editor/content/244dd612-48f4-46a0-a7cb-673650a5ff76.jpeg" data-bio="<strong>ชื่อจริง:</strong> วรันธร เปานิล (Waruntorn Paonil)<br><strong>ชื่อในวงการ:</strong> Ink Waruntorn<br><strong>เกิด:</strong> 23 กุมภาพันธ์ 1994<br><strong>ภูมิลำเนา:</strong> กรุงเทพฯ<br><strong>แนวเพลง:</strong> R&B / Soul / Pop / Hip-Hop<br><strong>ค่าย:</strong> BOXX MUSIC<br><br><strong>เส้นทางดนตรี</strong><ul><li>เริ่มเดบิวต์ในวงการตั้งแต่ปี 2006</li><li>เป็นศิลปินเดี่ยวค่าย BOXX MUSIC ตั้งแต่ปี 2015</li></ul>" data-extra='{"youtube":[{"title":"สายตาหลอกกันไม่ได้","url":"https://youtu.be/C2rD2h7OqI8"}],"apple":[{"title":"Ink Waruntorn","url":"https://music.apple.com/th/artist/ink-waruntorn/1068038828"}]}'><img src="https://yt3.googleusercontent.com/Fn6THjnRY5HNH6-Otij1SeOI5bR1ps993kGlmaUfoGJiuXvV5WJsSQBDDLeDJWG6hChy11jaZcA%3Ds900-c-k-c0x00ffffff-no-rj" class="artist-avatar" alt=""><div><div class="artist-name">Ink Waruntorn</div><div class="artist-info-sm">Thailand • Synth-Pop</div></div></button>
+             
+             <button class="artist-btn" data-group="thai" data-name="Sunnee (ซันนี่)" data-country="ไทย/จีน" data-style="C-Pop / R&B" data-photo="https://s.isanook.com/jo/0/ui/486/2433625/sunnee_press_image_04.jpg" data-bio="<strong>ชื่อจริง:</strong> Sunnee (Yang Yun-qing / 杨芸晴)<br><strong>เชื้อชาติ/พื้นเพ:</strong> จีน (เกิดที่ไทย มีเชื้อสายจีน)<br><strong>บ้านเกิด:</strong> กรุงเทพมหานคร ประเทศไทย<br><strong>สัญชาติ:</strong> จีน<br><strong>แนวเพลง:</strong> ป็อป, C-Pop, Mandopop<br><br><h5>เส้นทางในวงการ</h5><ul><li>เดบิวต์จากรายการเซอร์ไววัลจีน 'Produce 101 China'</li><li>เป็นหนึ่งในสมาชิกวงหญิง 'Rocket Girls 101'</li></ul>" data-extra='{"youtube":[{"title":"Sunnee MV","url":"https://youtu.be/5siJzY4rTVc"}],"apple":[{"title":"Sunnee","url":"https://music.apple.com/th/artist/sunnee%E6%9D%A8%E8%8A%B9%E6%99%B4/1825350744"}]}'><img src="https://s.isanook.com/jo/0/ui/486/2433625/sunnee_press_image_04.jpg" class="artist-avatar" alt=""><div><div class="artist-name">Sunnee (ซันนี่)</div><div class="artist-info-sm">Thai/China • C-Pop</div></div></button>
+             
+             <button class="artist-btn" data-group="thai" data-name="Blackbeans (Boom)" data-country="ไทย" data-style="Indie-Pop" data-photo="https://cdn.prod.website-files.com/649174dcab676e52a64ce81a/64ca16fd9512d3e42c622a96_N0vGd5sSXkhCHreSLFnvnRWAYqdeOLPNpYqe2fh51sYpQ-WGrNIvfUVWgzXx8UJT14KDguIWNXNFjSXfqLfCRTITKs9jAHUCWxe8XiZckDdFOTBS-zeYKdsIJhHipkMikBuIJYx7jnR_4jnONXNkpho.jpeg" data-img-pos="center center" data-bio="<strong>ชื่อจริง:</strong> พีรวิทย์ จิตการุณ (บูม)<br><strong>ตำแหน่ง:</strong> นักร้องนำวง Blackbeans<br><strong>แนวเพลง:</strong> Indie-Pop / Alternative Pop<br><br><strong>เส้นทางดนตรี</strong><ul><li>เริ่มก่อตั้งวงปี 2013 จากกลุ่มเพื่อนมัธยม</li><li>เติบโตอย่างสวยงามในวงการเพลงอินดี้ไทย</li></ul>" data-extra='{"youtube":[{"title":"Wish","url":"https://www.youtube.com/watch?v=UHpJzCd_lXo"},{"title":"You","url":"https://www.youtube.com/watch?v=CRvLi-xc6_E"},{"title":"Moon","url":"https://www.youtube.com/watch?v=GnQZmNf9KCg"}],"apple":[{"title":"Blackbeans","url":"https://music.apple.com/th/artist/blackbeans/1383298789?l=th"}]}'><img src="https://cdn.prod.website-files.com/649174dcab676e52a64ce81a/64ca16fd9512d3e42c622a96_N0vGd5sSXkhCHreSLFnvnRWAYqdeOLPNpYqe2fh51sYpQ-WGrNIvfUVWgzXx8UJT14KDguIWNXNFjSXfqLfCRTITKs9jAHUCWxe8XiZckDdFOTBS-zeYKdsIJhHipkMikBuIJYx7jnR_4jnONXNkpho.jpeg" class="artist-avatar" style="object-position: center center;" alt=""><div><div class="artist-name">Blackbeans (Boom)</div><div class="artist-info-sm">Thailand • Indie-Pop</div></div></button>
+             
+             <div class="artist-group-header" data-group="korea">🇰🇷 ศิลปินเกาหลี</div>
+             <button class="artist-btn" data-group="korea" data-name="Roseanne Park" data-country="เกาหลีใต้" data-style="K-Pop" data-photo="https://i.namu.wiki/i/fjnLZhByeJypmPtNpoH0W6BnJFw7l3AyZVH9LdhsQOdJWZS5jDSOCaE37ochEp4rvje_IgOfP1A36aMwcNvZcg.webp" data-bio="<strong>ชื่อจริง:</strong> พัก แชยอง (Park Chae-young)<br><strong>ชื่ออังกฤษ:</strong> Roseanne Park<br><strong>ชื่อในวงการ:</strong> ROSÉ (BLACKPINK)<br><br><ul><li>Main Vocalist ของ BLACKPINK</li><li>เดบิวต์เดี่ยวอัลบั้ม R (On The Ground, Gone)</li><li>Global Ambassador ของ Saint Laurent</li><li>มีเสียงร้องโทนหวาน–แหบเป็นเอกลักษณ์</li></ul>" data-extra='{"youtube":[{"title":"On The Ground","url":"https://youtu.be/CKZvWhCqx1s"}],"apple":[{"title":"ROSÉ","url":"https://music.apple.com/cd/artist/ros%C3%A9/1406242696"}]}'><img src="https://i.namu.wiki/i/fjnLZhByeJypmPtNpoH0W6BnJFw7l3AyZVH9LdhsQOdJWZS5jDSOCaE37ochEp4rvje_IgOfP1A36aMwcNvZcg.webp" class="artist-avatar" alt=""><div><div class="artist-name">Roseanne Park</div><div class="artist-info-sm">Korea • K-Pop</div></div></button>
+             
+             <div class="artist-group-header" data-group="western">🇺🇸 ศิลปินสากล</div>
+             <button class="artist-btn" data-group="western" data-name="Taylor Swift" data-country="USA" data-style="Pop / Country" data-photo="https://freight.cargo.site/t/original/i/e81c27bbe95fc33e5a72a3591bf94db6a7714c39ba290393489ff1ffcfc6a10c/MS_Swift_Taylor_CloseUp.jpg" data-bio="<strong>ชื่อจริง:</strong> Taylor Alison Swift<br><strong>เกิด:</strong> 13 ธันวาคม 1989 (West Reading, PA)<br><strong>สัญชาติ:</strong> อเมริกัน<br><br><h5>เส้นทางในวงการเพลง</h5><ul><li>เริ่มต้นจากแนวคันทรี่ในวัยรุ่น ก่อนเปลี่ยนสู่ป็อปเต็มตัว และอินดี้/โฟล์กในอัลบั้มหลังๆ</li><li>เป็นหนึ่งในศิลปินที่ทรงอิทธิพลที่สุดในยุคปัจจุบัน</li></ul>" data-extra='{"youtube":[{"title":"Shake It Off","url":"https://www.youtube.com/watch?v=nfWlot6h_JM"},{"title":"Blank Space","url":"https://www.youtube.com/watch?v=e-ORhEE9VVg"},{"title":"Anti-Hero","url":"https://www.youtube.com/watch?v=b1kbLwvqugk"},{"title":"Cruel Summer","url":"https://youtu.be/ic8j13piAhQ"}],"apple":[{"title":"Taylor Swift","url":"https://music.apple.com/us/artist/taylor-swift/159260351"}]}'><img src="https://freight.cargo.site/t/original/i/e81c27bbe95fc33e5a72a3591bf94db6a7714c39ba290393489ff1ffcfc6a10c/MS_Swift_Taylor_CloseUp.jpg" class="artist-avatar" alt=""><div><div class="artist-name">Taylor Swift</div><div class="artist-info-sm">USA • Pop</div></div></button>
+             
+             <div class="artist-group-header" data-group="japan">🇯🇵 ศิลปินญี่ปุ่น</div>
+             <button class="artist-btn" data-group="japan" data-name="ADO (อาโดะ)" data-country="ญี่ปุ่น" data-style="J-Rock / Pop" data-photo="https://cms.dmpcdn.com/musicarticle/2025/01/14/e5577330-d28d-11ef-af62-bbb29a1bba7c_webp_original.webp" data-bio="<strong>ชื่อจริง:</strong> ไม่เปิดเผย<br><strong>เกิด:</strong> 24 ตุลาคม ค.ศ. 2002<br><strong>สัญชาติ:</strong> ญี่ปุ่น<br><strong>บ้านเกิด:</strong> โตเกียว<br><strong>สังกัด:</strong> Universal Music Japan (Virgin Music)<br><br><h5>เส้นทางในวงการเพลง</h5><ul><li>เริ่มต้นจากการร้องเพลงคัฟเวอร์ลง Niconico ตั้งแต่อายุ 14</li><li>เดบิวต์อย่างเป็นทางการในปี 2020</li><li>เพลงเปิดตัว “Usseewa” กลายเป็นไวรัลทั่วญี่ปุ่น</li></ul>" data-extra='{"youtube":[{"title":"Usseewa","url":"https://youtu.be/Qp3b-RXtz4w"}],"apple":[{"title":"ADO","url":"https://music.apple.com/th/artist/ado/1492604670?l=th"}]}'><img src="https://cms.dmpcdn.com/musicarticle/2025/01/14/e5577330-d28d-11ef-af62-bbb29a1bba7c_webp_original.webp" class="artist-avatar" alt=""><div><div class="artist-name">ADO (อาโดะ)</div><div class="artist-info-sm">Japan • J-Pop</div></div></button>
           </div>
         </div>
       </div>
-
       <div class="col-lg-8">
         <div class="glass-panel p-4 h-100 position-relative">
-          <!-- ปรับโครงสร้าง HTML เล็กน้อยเพื่อรองรับดีไซน์ใหม่ -->
           <div class="detail-photo-container">
               <div class="detail-photo-inner">
                   <img id="dPhoto" src="" class="detail-photo" alt="Artist Photo">
@@ -861,7 +486,6 @@
                   </div>
               </div>
           </div>
-          
           <div class="row g-4">
             <div class="col-md-7">
               <h5 class="fw-bold mb-3 text-dark d-flex align-items-center"><i class="bi bi-brush me-2 text-primary"></i>ประวัติย่อ</h5>
@@ -878,74 +502,31 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ========================= EXPO SECTION ========================= -->
-<section id="expos" class="py-5 reveal">
-  <div class="container">
-    <div class="text-center mb-5 fade-in-up">
-      <h2 class="section-title mb-3">งานจัดแสดง</h2>
-      <div class="d-inline-block">
-        <span class="d-inline-flex align-items-center py-2 px-4 rounded-pill" style="background: #fff; border: 1px solid rgba(161, 140, 209, 0.3); box-shadow: 5px 5px 0px rgba(161, 140, 209, 0.2);">
-          <i class="bi bi-calendar-event me-2 text-dark"></i>
-          <span class="fw-bold text-dark">นิทรรศการที่น่าสนใจและอีเวนต์ต่างๆ</span>
-        </span>
-      </div>
-      <div class="d-flex justify-content-center flex-wrap gap-2 mt-4" id="expoFilters">
-        <div class="filter-chip active" data-filter="all">ทั้งหมด</div>
-        <div class="filter-chip" data-filter="thai">🇹🇭 ไทย</div>
-        <div class="filter-chip" data-filter="japan">🇯🇵 ญี่ปุ่น</div>
-        <div class="filter-chip" data-filter="korea">🇰🇷 เกาหลี</div>
-        <div class="filter-chip" data-filter="inter">🌏 สากล</div>
-      </div>
-    </div>
-    
-    <div id="expoList" class="row g-4">
-      <!-- Expo Items -->
-      <div class="col-md-6 col-xl-3 expo-col" data-country="thai"><div class="expo-card p-3" data-expo-id="expo-bkk" data-title="Bangkok Art Week 2024" data-place="BACC" data-photo="https://s.isanook.com/tr/0/ui/289/1446775/gal-1446775-20240202031401-cc112ef.jpeg" data-desc="เทศกาลศิลปะร่วมสมัยใจกลางกรุงเทพฯ" data-tags='["Contemporary"]'><div class="expo-img-wrap"><img src="https://s.isanook.com/tr/0/ui/289/1446775/gal-1446775-20240202031401-cc112ef.jpeg" alt=""></div><div class="px-1"><h6 class="fw-bold mb-1">Bangkok Art Week</h6><div class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-primary"></i> BACC</div></div></div></div>
-      <div class="col-md-6 col-xl-3 expo-col" data-country="japan"><div class="expo-card p-3" data-expo-id="expo-tokyo" data-title="Tokyo Watercolor" data-place="Tokyo" data-photo="https://cdn.pixabay.com/photo/2017/01/31/13/14/watercolor-2024213_1280.jpg" data-desc="นิทรรศการสีน้ำ" data-tags='["Watercolor"]'><div class="expo-img-wrap"><img src="https://cdn.pixabay.com/photo/2017/01/31/13/14/watercolor-2024213_1280.jpg" alt=""></div><div class="px-1"><h6 class="fw-bold mb-1">Tokyo Watercolor</h6><div class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-primary"></i> Tokyo</div></div></div></div>
-      <div class="col-md-6 col-xl-3 expo-col" data-country="korea"><div class="expo-card p-3" data-expo-id="expo-seoul" data-title="Seoul Art Fair" data-place="Seoul" data-photo="https://cdn.pixabay.com/photo/2016/06/29/10/54/korea-1482341_1280.jpg" data-desc="งานแฟร์ศิลปะ" data-tags='["Modern"]'><div class="expo-img-wrap"><img src="https://cdn.pixabay.com/photo/2016/06/29/10/54/korea-1482341_1280.jpg" alt=""></div><div class="px-1"><h6 class="fw-bold mb-1">Seoul Art Fair</h6><div class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-primary"></i> Seoul</div></div></div></div>
-      <div class="col-md-6 col-xl-3 expo-col" data-country="inter"><div class="expo-card p-3" data-expo-id="expo-ny" data-title="NYC Street Visual" data-place="NYC" data-photo="https://cdn.pixabay.com/photo/2018/10/04/12/32/graffiti-3728298_1280.jpg" data-desc="สตรีทอาร์ต" data-tags='["Street Art"]'><div class="expo-img-wrap"><img src="https://cdn.pixabay.com/photo/2018/10/04/12/32/graffiti-3728298_1280.jpg" alt=""></div><div class="px-1"><h6 class="fw-bold mb-1">NYC Street Visual</h6><div class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-primary"></i> NYC</div></div></div></div>
-    </div>
-    
-     <div id="expoPanel" class="d-none mt-4 fade-in-up">
-        <div class="glass-panel p-4 position-relative">
-          <button id="expoClose" class="btn btn-sm btn-circle position-absolute top-0 end-0 m-3 btn-light shadow-sm"><i class="bi bi-x-lg"></i></button>
-          <div class="row align-items-center">
-            <div class="col-md-5"><img id="ePhoto" src="" class="w-100 shadow-sm rounded-3" alt=""></div>
-            <div class="col-md-7"><div class="p-3"><h3 id="eTitle" class="fw-bold mb-2 text-dark"></h3><p id="ePlace" class="text-primary fw-medium mb-3"></p><p id="eDesc" class="text-muted lead fs-6 mb-4"></p><div id="eTags" class="d-flex gap-2"></div></div></div>
-          </div>
-        </div>
-     </div>
-  </div>
-</section>
-
-<!-- ========================= AI GURU SECTION (New) ========================= -->
 <section id="ai-guru" class="py-5 reveal">
   <div class="container">
-    <div class="text-center mb-4">
-      <h2 class="section-title mb-3">✨ AI Music Guru</h2>
-      <p class="text-muted">ให้ AI ช่วยแนะนำเพลงตามอารมณ์ของคุณ</p>
+    <div class="text-center mb-5">
+      <h2 class="section-title mb-0" data-text="AI Guru">✨ AI Guru</h2>
+      <p class="text-muted mt-2 fs-5">ให้ Guru ช่วยแนะนำเพลงตามอารมณ์ของคุณ</p>
     </div>
-    
     <div class="row justify-content-center">
       <div class="col-lg-8">
         <div class="ai-guru-container">
           <div id="ai-response" class="ai-chat-box">
             <p class="text-center text-muted my-5">
               <i class="bi bi-magic fs-1 d-block mb-3 text-secondary"></i>
-              สวัสดีครับ! วันนี้คุณรู้สึกอย่างไร หรืออยากฟังเพลงแนวไหน?<br>
-              บอกผมมาได้เลย เดี๋ยวผมจัดให้! 🎶
+              สวัสดีครับ! วันนี้คุณรู้สึกอย่างไร อยากฟังเพลงแนวไหน<br>
+              หรือกำลังมองหาคอนเสิร์ตน่าไปทั้งในและต่างประเทศ?<br>
+              บอก Guru ได้เลย เดี๋ยวจัดให้! 🎶
             </p>
           </div>
-          
-          <div class="ai-input-group">
-            <input type="text" id="ai-user-input" placeholder="เช่น 'อกหักอยากฟังเพลงเศร้า', 'ขอเพลงร็อคสนุกๆ', 'เพลงสำหรับอ่านหนังสือ'...">
-            <button id="btn-ask-ai" class="btn-ai-send">
-              <i class="bi bi-send-fill"></i>
+          <div class="ai-input-group mt-4">
+            <input type="text" id="ai-user-input" placeholder="เช่น 'อกหักอยากฟังเพลงเศร้า', 'แนะนำคอนเสิร์ตเกาหลีในไทยปีนี้'..." class="shadow-sm">
+            <button id="btn-ask-ai" class="btn-ai-send shadow-sm ms-2">
+              <i class="bi bi-send-fill fs-5"></i>
             </button>
           </div>
         </div>
@@ -954,83 +535,162 @@
   </div>
 </section>
 
-<!-- ========================= SUMMARY SECTION ========================= -->
-<section class="py-4 reveal">
+<section class="py-5 reveal">
   <div class="container">
-    <div class="glass-panel p-5" style="border-left: 5px solid var(--secondary); background: #fff;">
-      <h2 class="fw-bold mb-4 section-title" style="font-size:1.8rem; margin-bottom: 2rem;">
+    <div class="glass-panel p-5" style="border-left: 8px solid var(--secondary); background: #fff;">
+      <h2 class="fw-bold mb-5 section-title" style="font-size:2.2rem;">
         <i class="bi bi-chat-square-heart-fill text-danger me-2"></i>ArtistHub Gossip
       </h2>
       <div class="row gy-4" id="summary-container">
-        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-3" style="background:#fdf0f6; border:1px solid #fce4ec;"><h6 class="fw-bold mb-3 text-dark" id="sum-col1-title"></h6><div class="text-muted small" id="sum-col1-content"></div></div></div>
-        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-3" style="background:#f3e5f5; border:1px solid #f3e5f5;"><h6 class="fw-bold mb-3 text-dark" id="sum-col2-title"></h6><div class="text-muted small" id="sum-col2-content"></div></div></div>
-        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-3" style="background:#e0f7fa; border:1px solid #e0f7fa;"><h6 class="fw-bold mb-3 text-dark" id="sum-col3-title"></h6><div class="text-muted small" id="sum-col3-content"></div></div></div>
+        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-4 shadow-sm" style="background:#fdf0f6; border:1px solid #fce4ec;"><h6 class="fw-bold mb-3 text-dark" id="sum-col1-title"></h6><div class="text-muted small" id="sum-col1-content"></div></div></div>
+        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-4 shadow-sm" style="background:#f3e5f5; border:1px solid #f3e5f5;"><h6 class="fw-bold mb-3 text-dark" id="sum-col2-title"></h6><div class="text-muted small" id="sum-col2-content"></div></div></div>
+        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-4 shadow-sm" style="background:#e0f7fa; border:1px solid #e0f7fa;"><h6 class="fw-bold mb-3 text-dark" id="sum-col3-title"></h6><div class="text-muted small" id="sum-col3-content"></div></div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ========================= CHAT BOARD SECTION ========================= -->
-<section class="py-4 reveal">
+<section class="py-5 reveal">
   <div class="container">
-    <div class="glass-panel p-4">
-       <h2 class="fw-bold mb-2 section-title" style="font-size:1.6rem;">Fan Zone</h2>
-       <p class="text-center text-muted mb-4">ยินดีต้อนรับสู่โซนเม้าท์มอย! แปะโพสต์อิทคุยกันได้เลย</p>
-       <div class="chat-board-container">
-          <div class="post-it-grid" id="chat-messages">
-             <div class="post-it"><div class="post-it-meta">Blink_01</div>ไม่ทันเลยยย เว็บล่มตั้งแต่ 10 วิแรก</div>
-             <div class="post-it"><div class="post-it-meta">Me</div>รอกดรอบหน้าสู้ตาย! 🔥</div>
-             <div class="post-it"><div class="post-it-meta">3MD_Fan</div>Three Man Down ปล่อยเพลงใหม่แล้วนะ ไปฟังกันยัง?</div>
+    <div class="glass-panel p-5">
+       <div class="text-center mb-4">
+           <h2 class="fw-bold mb-2 section-title" style="font-size:2.2rem;" data-text="Fan Zone">Fan Zone</h2>
+           <p class="text-muted fs-5">โซนเม้าท์มอย! แปะโพสต์อิทคุยกันได้เลย</p>
+       </div>
+       <div class="chat-board-container mb-4">
+          <div class="post-it-grid d-flex flex-wrap justify-content-center gap-3" id="chat-messages">
+             <div class="text-center text-muted py-5 w-100">
+                <div class="spinner-border text-secondary mb-2" role="status"></div>
+                <p>กำลังโหลดข้อความ...</p>
+             </div>
           </div>
        </div>
        <form id="chat-form" class="d-flex gap-2 mt-4 justify-content-center">
-         <input type="text" id="chat-name" class="form-control shadow-none" placeholder="ชื่อของคุณ" style="max-width: 150px; border:2px solid #eee; border-radius: 10px;" required>
-         <input type="text" id="chat-input" class="form-control shadow-none" placeholder="แปะข้อความทิ้งไว้..." style="max-width: 400px; border:2px solid #eee; border-radius: 10px;" required>
-         <button type="submit" class="btn btn-dark shadow-sm rounded-circle" style="width:45px; height:45px; padding:0; display:flex; align-items:center; justify-content:center;"><i class="bi bi-send-fill"></i></button>
+         <input type="text" id="chat-name" class="form-control shadow-sm rounded-pill px-3" placeholder="ชื่อของคุณ" style="max-width: 150px; border:2px solid #eee;" required>
+         <input type="text" id="chat-input" class="form-control shadow-sm rounded-pill px-3" placeholder="แปะข้อความทิ้งไว้..." style="max-width: 400px; border:2px solid #eee;" required>
+         <button type="submit" class="btn btn-dark shadow rounded-circle" style="width:45px; height:45px; padding:0; display:flex; align-items:center; justify-content:center;"><i class="bi bi-send-fill"></i></button>
        </form>
     </div>
   </div>
 </section>
 
-<!-- ========================= MEMBERS SECTION ========================= -->
-<section id="members" class="py-5 reveal">
+<section class="py-5 reveal">
   <div class="container">
-    <div class="glass-panel p-5 text-center">
-      <h2 class="fw-bold mb-5 section-title" style="font-size:1.8rem;">
-        คณะผู้จัดทำ
-      </h2>
-      <div class="row g-3 justify-content-center">
-        <div class="col-md-6 col-lg-4"><div class="member-card"><div class="member-avatar-placeholder">S</div><h6 class="fw-bold text-dark">ศุภวิชญ์ แซ่อิ๋ว</h6><p class="text-muted small mb-0">68046786</p></div></div>
-        <div class="col-md-6 col-lg-4"><div class="member-card"><div class="member-avatar-placeholder">S</div><h6 class="fw-bold text-dark">ศตรายุ กรึงชัง</h6><p class="text-muted small mb-0">68060424</p></div></div>
-        <div class="col-md-6 col-lg-4"><div class="member-card"><div class="member-avatar-placeholder">P</div><h6 class="fw-bold text-dark">พชรดนัย เพียรทำดี</h6><p class="text-muted small mb-0">68060455</p></div></div>
-        <div class="col-md-6 col-lg-4"><div class="member-card"><div class="member-avatar-placeholder">R</div><h6 class="fw-bold text-dark">ราเวิน ไดลัน อาร์เนสัน</h6><p class="text-muted small mb-0">68067967</p></div></div>
-        <div class="col-md-6 col-lg-4"><div class="member-card"><div class="member-avatar-placeholder">S</div><h6 class="fw-bold text-dark">ศุภาพิชญ์ บุหรั่นฉาย</h6><p class="text-muted small mb-0">68062664</p></div></div>
-        <div class="col-md-6 col-lg-4"><div class="member-card"><div class="member-avatar-placeholder">P</div><h6 class="fw-bold text-dark">ภาคิน พงศ์มั่นจิน</h6><p class="text-muted small mb-0">68050800</p></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ========================= SUBMIT SECTION ========================= -->
-<section id="submit" class="py-5 reveal">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="glass-panel p-5 text-center">
-          <i class="bi bi-send-fill display-4 mb-3 text-primary"></i>
-          <h2 class="fw-bold mb-3 text-dark">ร่วมเป็นส่วนหนึ่งของคอมมูนิตี้</h2>
-          <p class="text-muted mb-5 px-md-5">ส่งฟอร์มเพื่อเพิ่มศิลปินที่ควรแนะนำบนเว็บนี้</p>
-          <!-- Updated Link -->
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLSdIBw1Q5YeZpzPkwbsaqFJs6ZW2xYZEd4dKYPrIJtsSLflENA/viewform" target="_blank" class="btn btn-contact px-5 py-3 text-white">ไปที่แบบฟอร์ม <i class="bi bi-arrow-right ms-2"></i></a>
+    <div class="radio-panel">
+      <div class="row g-0">
+        <div class="col-lg-5 p-5 d-flex flex-column justify-content-between position-relative text-center text-lg-start">
+           <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at top left, #6c5ce7 0%, transparent 60%); opacity:0.3; z-index:0;"></div>
+           <div style="z-index:1;">
+             <div class="d-flex align-items-center justify-content-center justify-content-lg-start mb-4">
+               <i class="bi bi-broadcast fs-3 me-2 text-danger animate__animated animate__flash animate__infinite animate__slow"></i>
+               <h2 class="fw-bold m-0 text-white" style="font-family:'Bai Jamjuree'; font-size:1.8rem; text-shadow: 0 0 10px rgba(0,0,0,0.5);">Global Radio</h2>
+             </div>
+             <div class="mb-4 text-center position-relative">
+               <div id="globe-container" class="globe-container"></div>
+               
+               <div class="mt-4">
+                   <h4 id="radio-station-name" class="fw-bold mb-1 text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Select a Station</h4>
+                   <p id="radio-country" class="text-white-50 small">Click the globe to explore</p>
+               </div>
+             </div>
+             
+             <div class="d-flex justify-content-center align-items-center gap-4 mb-3">
+               <button id="btn-radio-prev" class="btn btn-outline-light rounded-circle border-0 p-2"><i class="bi bi-skip-backward-fill fs-4"></i></button>
+               <button id="btn-radio-play" class="btn btn-light rounded-circle shadow-lg d-flex align-items-center justify-content-center hover-scale" style="width:65px; height:65px; color:#6c5ce7;">
+                 <i class="bi bi-play-fill fs-1 ms-1"></i>
+               </button>
+               <button id="btn-radio-next" class="btn btn-outline-light rounded-circle border-0 p-2"><i class="bi bi-skip-forward-fill fs-4"></i></button>
+             </div>
+             <div class="px-4 w-75 mx-auto">
+               <input type="range" class="form-range" id="radio-volume" min="0" max="1" step="0.1" value="0.8">
+             </div>
+           </div>
+        </div>
+        
+        <div class="col-lg-7 bg-dark text-white p-4" style="background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);">
+           <h5 class="fw-bold mb-4 px-2 text-white-50 border-bottom border-secondary pb-2"><i class="bi bi-globe-americas me-2"></i>Music Stations</h5>
+           
+           <div class="d-flex gap-2 px-2 mb-3 overflow-auto pb-2" id="radio-filters">
+               <button class="btn btn-sm btn-outline-light rounded-pill active px-3" data-filter="all">All</button>
+           </div>
+           
+           <div class="list-group list-group-flush custom-scroll pe-2" id="station-list" style="max-height: 450px; overflow-y: auto;">
+               </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ========================= FOOTER ========================= -->
-<footer class="text-center text-lg-start">
+<section id="submit" class="py-5 reveal">
   <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="glass-panel p-5 text-center">
+          <i class="bi bi-send-fill display-3 mb-3 text-primary"></i>
+          <h2 class="fw-bold mb-3 text-dark">ร่วมเป็นส่วนหนึ่งของคอมมูนิตี้</h2>
+          <p class="text-muted mb-4 px-md-5">ส่งฟอร์มเพื่อเพิ่มศิลปินที่ควรแนะนำบนเว็บนี้</p>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSdIBw1Q5YeZpzPkwbsaqFJs6ZW2xYZEd4dKYPrIJtsSLflENA/viewform" target="_blank" class="btn btn-contact px-5 py-3 text-white shadow">ไปที่แบบฟอร์ม <i class="bi bi-arrow-right ms-2"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="members" class="py-5 reveal">
+  <div class="container">
+    <div class="glass-panel p-5 text-center">
+      <h2 class="fw-bold mb-5 section-title" data-text="คณะผู้จัดทำ">คณะผู้จัดทำ</h2>
+      <div class="row g-4 justify-content-center">
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <div class="member-avatar-placeholder shadow-sm">S</div>
+                <h6 class="fw-bold text-dark mt-3">ศุภวิชญ์ แซ่อิ๋ว</h6>
+                <p class="text-muted small mb-0">68046786</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <div class="member-avatar-placeholder shadow-sm">S</div>
+                <h6 class="fw-bold text-dark mt-3">ศตรายุ กรึงชัง</h6>
+                <p class="text-muted small mb-0">68060424</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <div class="member-avatar-placeholder shadow-sm">P</div>
+                <h6 class="fw-bold text-dark mt-3">พชรดนัย เพียรทำดี</h6>
+                <p class="text-muted small mb-0">68060455</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <div class="member-avatar-placeholder shadow-sm">R</div>
+                <h6 class="fw-bold text-dark mt-3">ราเวิน ไดลัน อาร์เนสัน</h6>
+                <p class="text-muted small mb-0">68067967</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <div class="member-avatar-placeholder shadow-sm">S</div>
+                <h6 class="fw-bold text-dark mt-3">ศุภาพิชญ์ บุหรั่นฉาย</h6>
+                <p class="text-muted small mb-0">68062664</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <div class="member-avatar-placeholder shadow-sm">P</div>
+                <h6 class="fw-bold text-dark mt-3">ภาคิน พงศ์มั่นจิน</h6>
+                <p class="text-muted small mb-0">68050800</p>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-lg-start bg-white mt-5 border-top">
+  <div class="container py-5">
     <div class="row">
       <div class="col-md-4 mb-4 mb-md-0">
         <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-palette2 me-2 text-primary"></i>ArtistHub</h5>
@@ -1039,17 +699,17 @@
       <div class="col-md-4 mb-4 mb-md-0">
         <h6 class="fw-bold mb-3 text-dark">Navigation</h6>
         <ul class="list-unstyled small">
-          <li class="mb-2"><a href="#home" class="text-muted text-decoration-none">Home</a></li>
-          <li class="mb-2"><a href="#artists" class="text-muted text-decoration-none">Artists</a></li>
-          <li class="mb-2"><a href="#expos" class="text-muted text-decoration-none">Exhibitions</a></li>
+          <li class="mb-2"><a href="#home" class="text-muted text-decoration-none hover-primary">Home</a></li>
+          <li class="mb-2"><a href="#artists" class="text-muted text-decoration-none hover-primary">Artists</a></li>
+          <li class="mb-2"><a href="#ai-guru" class="text-muted text-decoration-none hover-primary">AI Guru</a></li>
         </ul>
       </div>
       <div class="col-md-4">
         <h6 class="fw-bold mb-3 text-dark">Contact</h6>
         <ul class="list-inline">
-          <li class="list-inline-item"><a href="#" class="text-muted fs-5"><i class="bi bi-facebook"></i></a></li>
-          <li class="list-inline-item"><a href="#" class="text-muted fs-5"><i class="bi bi-twitter-x"></i></a></li>
-          <li class="list-inline-item"><a href="#" class="text-muted fs-5"><i class="bi bi-instagram"></i></a></li>
+          <li class="list-inline-item"><a href="#" class="text-muted fs-5 hover-scale"><i class="bi bi-facebook"></i></a></li>
+          <li class="list-inline-item"><a href="#" class="text-muted fs-5 hover-scale"><i class="bi bi-twitter-x"></i></a></li>
+          <li class="list-inline-item"><a href="#" class="text-muted fs-5 hover-scale"><i class="bi bi-instagram"></i></a></li>
         </ul>
         <p class="text-muted small mt-2">© 2025 ArtistHub. All rights reserved.</p>
       </div>
@@ -1057,28 +717,134 @@
   </div>
 </footer>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { getAuth, signInAnonymously, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { getFirestore, collection, addDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
+    // --- Firebase Setup ---
+    const firebaseConfig = JSON.parse(__firebase_config);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+    // --- Real-time Chat Logic ---
+    const chatContainer = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const nameInput = document.getElementById('chat-name');
+    const msgInput = document.getElementById('chat-input');
+    const badWords = ['กู', 'มึง', 'สัส', 'เหี้ย', 'ควาย', 'ควย', 'เย็ด', 'shit', 'fuck', 'damn', 'bitch'];
+
+    // Helper to render a single message
+    const renderPost = (doc) => {
+        const data = doc.data();
+        const div = document.createElement('div');
+        div.className = 'post-it animate__animated animate__zoomIn';
+        // Random rotation for visual flair
+        const rotate = Math.floor(Math.random() * 6) - 3; 
+        div.style.transform = `rotate(${rotate}deg)`;
+        div.innerHTML = `<div class="post-it-meta text-truncate" style="max-width:100%;">${data.name}</div><div style="word-wrap: break-word;">${data.message}</div>`;
+        return div;
+    };
+
+    const initChat = async () => {
+        try {
+            // 1. Authenticate
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            // 2. Listen to Firestore
+            if (auth.currentUser) {
+                const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'fanzone_posts');
+                
+                onSnapshot(postsRef, (snapshot) => {
+                    const posts = [];
+                    snapshot.forEach((doc) => {
+                        posts.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    // Client-side sort (Newest last)
+                    posts.sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    // Keep only last 8 posts for UI cleaniness
+                    const recentPosts = posts.slice(-8);
+
+                    chatContainer.innerHTML = ''; // Clear loading or old
+                    if (recentPosts.length === 0) {
+                         chatContainer.innerHTML = '<div class="text-muted w-100 text-center py-5">ยังไม่มีข้อความ มาเป็นคนแรกสิ!</div>';
+                    } else {
+                        recentPosts.forEach(post => {
+                            // Reuse render logic, slightly modified for object input
+                            const div = document.createElement('div');
+                            div.className = 'post-it animate__animated animate__zoomIn';
+                            // Random rotation for visual flair
+                            const rotate = Math.floor(Math.random() * 6) - 3; 
+                            div.style.transform = `rotate(${rotate}deg)`;
+                            div.innerHTML = `<div class="post-it-meta text-truncate" style="max-width:100%;">${post.name}</div><div style="word-wrap: break-word;">${post.message}</div>`;
+                            chatContainer.appendChild(div);
+                        });
+                        // Scroll to bottom if needed (though horizontal flex here)
+                    }
+                }, (error) => {
+                    console.error("Chat Error:", error);
+                    chatContainer.innerHTML = '<div class="text-danger w-100 text-center">ไม่สามารถโหลดข้อความได้</div>';
+                });
+            }
+
+            // 3. Handle Submit
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = nameInput.value.trim();
+                const msg = msgInput.value.trim();
+
+                if (!name || !msg) return;
+                if (badWords.some(w => name.toLowerCase().includes(w) || msg.toLowerCase().includes(w))) {
+                    alert("ข้อความมีคำหยาบ กรุณาใช้คำสุภาพครับ!");
+                    return;
+                }
+
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fanzone_posts'), {
+                        name: name,
+                        message: msg,
+                        timestamp: Date.now()
+                    });
+                    msgInput.value = ''; // Clear input
+                } catch (err) {
+                    console.error("Send Error:", err);
+                    alert("ส่งข้อความไม่สำเร็จ กรุณาลองใหม่");
+                }
+            });
+
+        } catch (err) {
+            console.error("Auth Error:", err);
+            chatContainer.innerHTML = '<div class="text-danger w-100 text-center">ระบบแชทขัดข้อง</div>';
+        }
+    };
+
+    initChat();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // --- 1. ระบบ Scroll Reveal (Enhanced) ---
+  // 1. Reveal & Scroll
   (function(){
     const reveals = document.querySelectorAll('.reveal');
     const revealOnScroll = () => {
       const windowHeight = window.innerHeight;
-      const elementVisible = 100;
       reveals.forEach(reveal => {
-        const elementTop = reveal.getBoundingClientRect().top;
-        if (elementTop < windowHeight - elementVisible) {
-          reveal.classList.add('active');
-        }
+        if (reveal.getBoundingClientRect().top < windowHeight - 100) reveal.classList.add('active');
       });
     };
     window.addEventListener('scroll', revealOnScroll);
     revealOnScroll();
   })();
 
-  // --- 2. ระบบ Scroll Spy ---
+  // 2. Scroll Spy
   (function(){
     const sections = document.querySelectorAll('section[id], header[id]');
     const navLinks = document.querySelectorAll('.nav-link');
@@ -1096,75 +862,34 @@
     sections.forEach(section => observer.observe(section));
   })();
 
-  // --- 3. ระบบแชท ---
+  // 4-5. Filters
   (function(){
-     const form = document.getElementById('chat-form');
-     const container = document.getElementById('chat-messages');
-     const nameInput = document.getElementById('chat-name');
-     const msgInput = document.getElementById('chat-input');
-     const MAX_POSTS = 4; 
-     const badWords = ['กู', 'มึง', 'สัส', 'เหี้ย', 'ควาย', 'ควย', 'เย็ด', 'shit', 'fuck', 'damn', 'bitch']; 
-     
-     if(form && container) {
-        form.addEventListener('submit', (e) => {
-           e.preventDefault();
-           let name = nameInput.value.trim();
-           let msg = msgInput.value.trim();
-           if(!name || !msg) return;
-           if (badWords.some(w => name.toLowerCase().includes(w) || msg.toLowerCase().includes(w))) {
-               alert("ข้อความมีคำหยาบ กรุณาใช้คำสุภาพครับ!"); msgInput.value = ''; return;
-           }
-           const note = document.createElement('div');
-           note.className = 'post-it';
-           note.innerHTML = `<div class="post-it-meta">${name}</div>${msg}`;
-           container.appendChild(note);
-           if(container.getElementsByClassName('post-it').length > MAX_POSTS) container.removeChild(container.firstChild);
-           msgInput.value = '';
-           const board = document.querySelector('.chat-board-container');
-           if(board) board.scrollTop = board.scrollHeight;
+    const setupFilter = (filterId, itemClass) => {
+        const filters = document.querySelectorAll(`#${filterId} .filter-chip`);
+        const items = document.querySelectorAll(`.${itemClass}`);
+        filters.forEach(f => {
+          f.addEventListener('click', () => {
+            filters.forEach(el => el.classList.remove('active')); f.classList.add('active');
+            const filterVal = f.dataset.filter; 
+            items.forEach(item => {
+              const group = item.dataset.group || item.dataset.country;
+              if (filterVal === 'all' || filterVal === group) item.classList.remove('hidden'); else item.classList.add('hidden');
+            });
+            // Special for artist headers
+            if(itemClass === 'artist-btn') {
+                const headers = document.querySelectorAll('.artist-group-header');
+                headers.forEach(h => {
+                    if(filterVal === 'all') h.classList.remove('hidden');
+                    else { if(filterVal === h.dataset.group) h.classList.remove('hidden'); else h.classList.add('hidden'); }
+                });
+            }
+          });
         });
-     }
+    };
+    setupFilter('artistFilters', 'artist-btn');
   })();
 
-  // --- 4. ระบบกรองศิลปิน ---
-  (function(){
-    const filters = document.querySelectorAll('#artistFilters .filter-chip');
-    const items = document.querySelectorAll('.artist-btn');
-    const headers = document.querySelectorAll('.artist-group-header');
-    filters.forEach(f => {
-      f.addEventListener('click', () => {
-        filters.forEach(el => el.classList.remove('active')); f.classList.add('active');
-        const filterVal = f.dataset.filter; 
-        items.forEach(item => {
-          const group = item.dataset.group;
-          if (filterVal === 'all' || filterVal === group) item.classList.remove('hidden'); else item.classList.add('hidden');
-        });
-        headers.forEach(h => {
-          const group = h.dataset.group;
-          if(filterVal === 'all') h.classList.remove('hidden');
-          else { if (filterVal === group) h.classList.remove('hidden'); else h.classList.add('hidden'); }
-        });
-      });
-    });
-  })();
-
-  // --- 5. ระบบกรองนิทรรศการ ---
-  (function(){
-    const filters = document.querySelectorAll('#expoFilters .filter-chip');
-    const items = document.querySelectorAll('.expo-col');
-    filters.forEach(f => {
-      f.addEventListener('click', () => {
-        filters.forEach(el => el.classList.remove('active')); f.classList.add('active');
-        const filterVal = f.dataset.filter; 
-        items.forEach(item => {
-          const country = item.dataset.country;
-          if (filterVal === 'all' || filterVal === country) item.classList.remove('hidden'); else item.classList.add('hidden');
-        });
-      });
-    });
-  })();
-
-  // --- 6. ระบบหมุนเวียนข่าวซุบซิบ (Gossip Rotation) ---
+  // 6. Gossip
   (function(){
      const gossipSets = [
        { c1: { icon: 'bi-patch-question-fill', color: 'text-primary', title: 'เว็บนี้มีไว้ทำไมคะซิส?', content: `<p class="mb-2"><strong>ArtistHub คือ:</strong> พื้นที่ป้ายยาล้วนๆ!</p><span class="badge bg-secondary text-light">#พื้นที่อวยยศ</span>` }, c2: { icon: 'bi-heart-fill', color: 'text-danger', title: 'โมเม้นต์น่าเอ็นดู', content: `<ul class="list-unstyled mb-0"><li>👑 <strong>แม่โบกี้:</strong> ร้องสดกินแผ่น!</li><li>🎤 <strong>Ado:</strong> ตัวจริงขี้อายนะเออ</li></ul>` }, c3: { icon: 'bi-camera-reels-fill', color: 'text-success', title: 'เก็บตกงานอาร์ต', content: `<ul class="list-unstyled mb-0"><li>🔥 <strong>BKK Art Week:</strong> งานดี แต่ร้อนตับแตก</li></ul>` } },
@@ -1187,19 +912,16 @@
      }, 6000); 
   })();
 
-  /* --- 7. ระบบหมุนเวียนไฮไลท์หน้าแรก --- */
+  // 7. Carousel
   (function() {
     const artistSets = [
       { name: "Three Man Down", titleHTML: "Three Man<br><span style='color:var(--primary);'>Down</span>", desc: "วงป๊อปร็อกหน้าใหม่ที่มาแรงที่สุดในขณะนี้", largeConcertImage: "https://i.ytimg.com/vi/bqQBTWViS1Q/maxresdefault.jpg", images: ["https://mintmagth.s3.ap-southeast-1.amazonaws.com/photos/shares/Mint%20Story/2023/AUG%202023/Three%20Man%20Down%20Concert/64e4561744309.jpg","https://admin.adaddictth.com/files/Cilent%202023/TMD/image12.png","https://i.ytimg.com/vi/nXtphDSQEEk/hq720.jpg?rs=AOn4CLBksiqvHJ_cDD-aykTpUF6UV3Ah3w&sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD"], profileImage: "https://mintmagth.s3.ap-southeast-1.amazonaws.com/photos/shares/Mint%20Story/2023/June%202023/Three%20Man%20Down%20Con/647c174726716.jpg", imgPos: "center center" },
       { name: "BOWKYLION", titleHTML: "BOWKY<br><span style='color:var(--primary);'>LION</span>", desc: "เจ้าแม่เพลงเศร้าและแฟชั่นไอคอนแห่งยุค", largeConcertImage: "https://res.theconcert.com/c_thumb/a76d06dbb1fba1620cba65cd99f39a67a/sold-out_bowkylion_lanta_concert.jpg", images: ["https://i.ytimg.com/vi/dp49zogJNxg/maxresdefault.jpg","https://occ-0-8407-2218.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABcxqLf9izjiJSz1id_Q20QIXPmR9XQ6mE5buEqF6ubGEeYus0VI63AwkUewbXkgcbEgdbtxJw6yepNYn-WuVVeUafUEb_MhE4Ayb.jpg?r=257","https://i.ytimg.com/vi/qcLYqx_uPWs/hq720.jpg?rs=AOn4CLBuvWnhlTz9YN6tim8-zllDCufIdw&sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD"], profileImage: "https://media.atime.live/content/c7a34615-d6a7-43ab-a59d-17b3bae0c99e.jpeg", imgPos: "top center" },
-      // Updated ADO image alignment to focus on Uta's face/hand properly
       { name: "ADO (อาโดะ)", titleHTML: "ADO<br><span>Uta</span>", desc: "พลังเสียงปีศาจจากญี่ปุ่น", largeConcertImage: "https://m.media-amazon.com/images/M/MV5BY2U4ZWNkMzMtZjg4Zi00ZWMyLWE1NmQtZDU2MWE4YjYxMTdmXkEyXkFqcGc%40._V1_.jpg", images: ["https://i.ytimg.com/vi/HmkbBdD8044/maxresdefault.jpg","https://images.squarespace-cdn.com/content/v1/5ac8997aaa49a16d3b6dfe3a/69654240-9b64-4ce0-b9ba-d6fd80ae36e3/Ado-Live-Tour-2023-2-Budokan-A.jpg","https://resonance-mms.com/wp-content/uploads/2023/10/RMMS-Ado-Mars-Live-Tour-2023-3-Budokan-B.jpg"], profileImage: "https://cms.dmpcdn.com/musicarticle/2025/01/14/e5577330-d28d-11ef-af62-bbb29a1bba7c_webp_original.webp", imgPos: "center 20%" },
       { name: "Roseanne Park", titleHTML: "Roseanne<br><span>Park</span>", desc: "เสียงร้องเอกลักษณ์และเสน่ห์ที่ไม่อาจต้านทาน", largeConcertImage: "https://i.pinimg.com/736x/02/37/cb/0237cb13ff9c455b48fbe4bc411c2ac5.jpg", images: ["https://pbs.twimg.com/media/GymqgizWoAAudO2.jpg","https://pbs.twimg.com/media/EUAZwGVVAAAjp3H.jpg","https://www.billboard.com/wp-content/uploads/2025/01/Rose-fallon-dec-2024-billboard-1548.jpg?crop=1&h=628&w=942"], profileImage: "https://i.namu.wiki/i/fjnLZhByeJypmPtNpoH0W6BnJFw7l3AyZVH9LdhsQOdJWZS5jDSOCaE37ochEp4rvje_IgOfP1A36aMwcNvZcg.webp", imgPos: "top center" },
       { name: "Taylor Swift", titleHTML: "Taylor<br><span>Swift</span>", desc: "ศิลปินหญิงผู้ทรงอิทธิพลระดับโลก", largeConcertImage: "https://ca-times.brightspotcdn.com/dims4/default/f3116da/2147483647/strip/true/crop/5616x3744%2B0%2B0/resize/1200x800%21/quality/75/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fb9%2F47%2F3c51991c44b798e0beda7e4b85f5%2Ftaylor-swift-eras-tour-opener-glendale-ariz-07236.jpg", images: ["https://www.rollingstone.com/wp-content/uploads/2023/05/taylor-swift-metlife-opening.jpg?crop=1&h=900&w=1600","https://thedailytexan.com/wp-content/uploads/2023/04/IMG_4605-900x675.jpg","https://media.architecturaldigest.com/photos/6418aaacc32da9aef3ceda64/master/w_1600%2Cc_limit/GettyImages-1474263664.jpg"], profileImage: "https://freight.cargo.site/t/original/i/e81c27bbe95fc33e5a72a3591bf94db6a7714c39ba290393489ff1ffcfc6a10c/MS_Swift_Taylor_CloseUp.jpg", imgPos: "center center" }
     ];
-    
     let currentIndex = 0;
-    const nameEl = document.getElementById('highlight-name');
     const img1 = document.getElementById('bento-img-1');
     const img2 = document.getElementById('bento-img-2');
     const img3 = document.getElementById('bento-img-3');
@@ -1211,39 +933,31 @@
 
     setInterval(() => {
       allVisuals.forEach(img => img?.parentElement?.classList.add('bento-content-fade'));
-      nameEl?.classList.add('text-fade');
-      titleEl?.classList.add('text-fade');
-      descEl?.classList.add('text-fade');
+      if(titleEl) titleEl.classList.add('text-fade');
+      if(descEl) descEl.classList.add('text-fade');
 
       setTimeout(() => {
         currentIndex = (currentIndex + 1) % artistSets.length;
         const nextArtist = artistSets[currentIndex];
-        if(nameEl) nameEl.textContent = nextArtist.name;
         if(titleEl) titleEl.innerHTML = nextArtist.titleHTML;
         if(descEl) descEl.textContent = nextArtist.desc;
         
-        // ปรับปรุง: กำหนดรูปและ Position
         if(img1) { img1.src = nextArtist.largeConcertImage; img1.style.objectPosition = nextArtist.imgPos || 'center center'; }
         if(img2) { img2.src = nextArtist.images[0]; img2.style.objectPosition = nextArtist.imgPos || 'center center'; }
         if(img3) { img3.src = nextArtist.images[1]; img3.style.objectPosition = nextArtist.imgPos || 'center center'; }
         if(img4) { img4.src = nextArtist.images[2]; img4.style.objectPosition = nextArtist.imgPos || 'center center'; }
-        
-        if(profileImg) {
-            profileImg.src = nextArtist.profileImage;
-            profileImg.style.objectPosition = nextArtist.imgPos || 'center center';
-        }
+        if(profileImg) { profileImg.src = nextArtist.profileImage; profileImg.style.objectPosition = nextArtist.imgPos || 'center center'; }
 
         setTimeout(() => {
           allVisuals.forEach(img => img?.parentElement?.classList.remove('bento-content-fade'));
-          nameEl?.classList.remove('text-fade');
-          titleEl?.classList.remove('text-fade');
-          descEl?.classList.remove('text-fade');
+          if(titleEl) titleEl.classList.remove('text-fade');
+          if(descEl) descEl.classList.remove('text-fade');
         }, 100);
       }, 500); 
     }, 8000);
   })();
 
-  /* ... (Remaining JS) ... */
+  // Detail View
   const artistBtns = document.querySelectorAll('.artist-btn');
   const dPhoto = document.getElementById('dPhoto');
   const dName = document.getElementById('dName');
@@ -1257,45 +971,28 @@
     artistBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     const data = btn.dataset;
-    if(dPhoto) { dPhoto.style.opacity = 0; setTimeout(() => { dPhoto.src = data.photo; dPhoto.style.opacity = 1; }, 200); }
+    if(dPhoto) { 
+        dPhoto.style.opacity = 0; 
+        setTimeout(() => { dPhoto.src = data.photo; dPhoto.style.opacity = 1; }, 200); 
+    }
     if(dName) dName.textContent = data.name;
     if(dCountry) dCountry.textContent = data.country;
     if(dStyle) dStyle.textContent = data.style;
-    
-    if(dBio) {
-       dBio.classList.remove('bio-anim'); 
-       void dBio.offsetWidth; 
-       // Use innerHTML here to render HTML tags correctly
-       dBio.innerHTML = data.bio; 
-       dBio.classList.add('bio-anim'); 
-    }
+    if(dBio) { dBio.classList.remove('bio-anim'); void dBio.offsetWidth; dBio.innerHTML = data.bio; dBio.classList.add('bio-anim'); }
     
     let extra = {}; try { extra = JSON.parse(data.extra); } catch(e){}
     if(dYoutube) {
         dYoutube.innerHTML = '';
         if(extra.youtube) {
           extra.youtube.forEach(v => {
-            // --- แก้ไขการดึง ID วิดีโอให้แม่นยำขึ้น และตัดพารามิเตอร์ส่วนเกินออก ---
             let vidId = '';
             try {
-                if (v.url.includes('youtu.be/')) {
-                    vidId = v.url.split('youtu.be/')[1].split('?')[0].split('&')[0];
-                } else if (v.url.includes('v=')) {
-                    vidId = v.url.split('v=')[1].split('&')[0].split('?')[0];
-                }
-            } catch (err) { console.error("Error parsing video ID", v.url); }
-
+                if (v.url.includes('youtu.be/')) vidId = v.url.split('youtu.be/')[1].split('?')[0].split('&')[0];
+                else if (v.url.includes('v=')) vidId = v.url.split('v=')[1].split('&')[0].split('?')[0];
+            } catch (err) {}
             if(vidId) {
                 const card = document.createElement('div'); card.className = 'video-card';
-                // ใช้ hqdefault เพื่อภาพปกที่ชัดกว่า mqdefault
-                card.innerHTML = `
-                    <img src="https://img.youtube.com/vi/${vidId}/hqdefault.jpg" 
-                         onerror="this.src='https://via.placeholder.com/320x180.png?text=No+Cover'">
-                    <div class="play-overlay">
-                        <div class="play-icon"><i class="bi bi-play-fill fs-4"></i></div>
-                    </div>
-                    <div class="p-2 small fw-bold text-truncate text-dark">${v.title}</div>
-                `;
+                card.innerHTML = `<img src="https://img.youtube.com/vi/${vidId}/hqdefault.jpg" onerror="this.src='https://via.placeholder.com/320x180.png?text=No+Cover'"><div class="play-overlay"><div class="play-icon"><i class="bi bi-play-fill fs-4"></i></div></div><div class="p-2 small fw-bold text-truncate text-dark">${v.title}</div>`;
                 card.onclick = () => window.open(v.url, '_blank');
                 dYoutube.appendChild(card);
             }
@@ -1317,64 +1014,19 @@
   if(artistBtns.length) updateArtistDetail(artistBtns[0]);
   artistBtns.forEach(btn => btn.addEventListener('click', () => updateArtistDetail(btn)));
 
-  /* Expo Logic */
-  const expoCards = document.querySelectorAll('.expo-card');
-  const expoPanel = document.getElementById('expoPanel');
-  const expoList = document.getElementById('expoList');
-  const expoClose = document.getElementById('expoClose');
-  const ePhoto = document.getElementById('ePhoto');
-  const eTitle = document.getElementById('eTitle');
-  const ePlace = document.getElementById('ePlace');
-  const eDesc = document.getElementById('eDesc');
-  const eTags = document.getElementById('eTags');
-
-  if(expoCards.length) {
-      expoCards.forEach(card => {
-        card.addEventListener('click', () => {
-          const data = card.dataset;
-          if(ePhoto) ePhoto.src = data.photo;
-          if(eTitle) eTitle.textContent = data.title;
-          if(ePlace) ePlace.textContent = data.place;
-          if(eDesc) eDesc.textContent = data.desc;
-          if(eTags) {
-             eTags.innerHTML = '';
-             try { JSON.parse(data.tags).forEach(t => { const s = document.createElement('span'); s.className = 'badge-custom me-1 text-dark'; s.textContent = t; eTags.appendChild(s); }); } catch(e){}
-          }
-          if(expoList) expoList.classList.add('d-none');
-          if(expoPanel) expoPanel.classList.remove('d-none');
-        });
-      });
-  }
-  if(expoClose) {
-      expoClose.addEventListener('click', () => {
-          if(expoPanel) expoPanel.classList.add('d-none');
-          if(expoList) expoList.classList.remove('d-none');
-      });
-  }
-  
-  const artistToggle = document.getElementById('artistToggle');
-  const artistList = document.getElementById('artistList');
-  if(artistToggle && artistList) {
-     let isExpanded = false;
-     artistToggle.addEventListener('click', (e) => {
-       e.preventDefault(); isExpanded = !isExpanded;
-       artistList.style.maxHeight = isExpanded ? artistList.scrollHeight + 'px' : '450px';
-       artistToggle.innerHTML = isExpanded ? `ย่อกลับ` : `ดูทั้งหมด`;
-     });
-  }
-  
+  // Nav Scroll
   window.addEventListener('scroll', () => {
     const nav = document.querySelector('.navbar');
     if(window.scrollY > 50) { if(nav) { nav.style.background = 'rgba(255,255,255,0.98)'; nav.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)'; } }
     else { if(nav) { nav.style.background = 'rgba(255,255,255,0.95)'; nav.style.boxShadow = 'none'; } }
   });
 
-  /* --- AI Guru Functionality (Gemini API) --- */
+  // AI Guru
   (function() {
      const chatBox = document.getElementById('ai-response');
      const userInput = document.getElementById('ai-user-input');
      const btnSend = document.getElementById('btn-ask-ai');
-     const apiKey = ""; // ใส่ API Key ที่นี่ หรือปล่อยว่างหากรันใน environment ที่รองรับ
+     const apiKey = "AIzaSyBhiWmyDi8AoybLhznA_WBzSAZTB2SB2PA"; 
 
      if(btnSend && userInput && chatBox) {
         const addMessage = (text, isUser = false) => {
@@ -1395,10 +1047,12 @@
            const loadingHtml = `<span id="${loadingId}" class="typing-indicator"><i class="bi bi-three-dots-vertical"></i> กำลังคิด...</span>`;
            addMessage(loadingHtml);
            
-           // Check if API Key is set
            if (!apiKey) {
-               // ถ้าใน environment ของคุณมีการฉีด key เข้ามาผ่านตัวแปรอื่น ให้ใช้ตัวแปรนั้นแทน
-               // หรือแจ้งเตือนผู้ใช้
+               setTimeout(() => {
+                   document.getElementById(loadingId)?.closest('p')?.remove();
+                   addMessage(`<strong>[Demo Mode]</strong> (No API Key)`);
+               }, 1500);
+               return;
            }
 
            try {
@@ -1406,26 +1060,16 @@
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' },
                  body: JSON.stringify({
-                    contents: [{ parts: [{ text: "You are a helpful and cool music expert assistant for a website called ArtistHub. Answer in Thai only. Recommend songs or artists based on this user request: " + prompt }] }]
+                    contents: [{ parts: [{ text: "You are a helpful and cool music & concert expert assistant for a website called ArtistHub. Answer in Thai only. Recommend songs, artists, or concerts (both in Thailand and international) based on this user request: " + prompt }] }]
                  })
               });
               
               const data = await response.json();
-              
-              if (data.error) {
-                  throw new Error(data.error.message || "API Error");
-              }
-
+              if (data.error) throw new Error(data.error.message || "API Error");
               const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-              
-              document.getElementById(loadingId)?.closest('p')?.remove(); // Remove loading
-              
-              if (aiText) {
-                  addMessage(aiText);
-              } else {
-                  addMessage("ขออภัยครับ ไม่ได้รับคำตอบจาก AI (ข้อมูลผิดพลาด)");
-              }
-
+              document.getElementById(loadingId)?.closest('p')?.remove();
+              if (aiText) addMessage(aiText);
+              else addMessage("ขออภัยครับ ไม่ได้รับคำตอบจาก AI (ข้อมูลผิดพลาด)");
            } catch (error) {
               console.error(error);
               document.getElementById(loadingId)?.closest('p')?.remove();
@@ -1440,12 +1084,382 @@
            userInput.value = '';
            callGemini(text);
         });
-
-        userInput.addEventListener('keypress', (e) => {
-           if(e.key === 'Enter') btnSend.click();
-        });
+        userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') btnSend.click(); });
      }
   })();
+
+  /* --- 9. World Radio Player with Three.js Globe and Filters --- */
+  (function(){
+    // [UPDATED] แก้ไขลิงก์สถานีไทยใหม่ให้เป็นคลื่นที่เล่นได้จริง (Web-Ready HTTPS)
+    const stations = [
+      // 🇹🇭 Thailand
+      { name: "Surf 93.5", country: "Thailand", flag: "🇹🇭", genre: "Easy Listening", url: "https://surffm.radioca.st/stream", lat: 12.56, lon: 99.95 },
+      { name: "Thai Pop Radio", country: "Thailand", flag: "🇹🇭", genre: "T-Pop Hits", url: "https://stream.zeno.fm/geed9wry744tv", lat: 13.75, lon: 100.50 },
+      
+      // 🇯🇵 Japan
+      { name: "Listen.moe (J-Pop)", country: "Japan", flag: "🇯🇵", genre: "Anime / J-Pop", url: "https://listen.moe/stream", lat: 35.68, lon: 139.76 },
+      { name: "Asia DREAM Radio", country: "Japan", flag: "🇯🇵", genre: "J-Pop / Sakura", url: "https://igor.torontocast.com:1025/;", lat: 34.69, lon: 135.50 },
+
+      // 🇰🇷 Korea
+      { name: "Listen.moe (K-Pop)", country: "Korea", flag: "🇰🇷", genre: "K-Pop Hits", url: "https://listen.moe/kpop/stream", lat: 37.56, lon: 126.97 },
+      { name: "Big B Radio", country: "Korea", flag: "🇰🇷", genre: "Asian Pop", url: "https://streaming.radio.co/s06b196587/listen", lat: 36.0, lon: 128.0 },
+
+      // 🇺🇸 USA
+      { name: "SomaFM: Groove Salad", country: "USA", flag: "🇺🇸", genre: "Chill / Ambient", url: "https://ice1.somafm.com/groovesalad-128-mp3", lat: 37.77, lon: -122.41 },
+      { name: "KEXP Seattle", country: "USA", flag: "🇺🇸", genre: "Alt / Rock", url: "https://live-aacplus-64.kexp.org/kexp64.aac", lat: 47.60, lon: -122.33 },
+
+      // 🌏 Global / Europe
+      { name: "Ibiza Global Radio", country: "Spain", flag: "🇪🇸", genre: "Electronic", url: "https://listenssl.ibizaglobalradio.com:8024/ibizaglobalradio.mp3", lat: 40.41, lon: -3.70 },
+      { name: "FIP Radio", country: "France", flag: "🇫🇷", genre: "Eclectic / Jazz", url: "https://icecast.radiofrance.fr/fip-midfi.mp3", lat: 48.85, lon: 2.35 },
+      { name: "Lofi Hip Hop", country: "World", flag: "☕", genre: "Study / Relax", url: "https://play.streamafrica.net/lofi", lat: 0, lon: 0 }
+    ];
+
+    let audio = new Audio();
+    audio.crossOrigin = "anonymous";
+    let isPlaying = false;
+    let currentIdx = 0;
+    let activeFilter = 'all';
+
+    const btnPlay = document.getElementById('btn-radio-play');
+    const btnPrev = document.getElementById('btn-radio-prev');
+    const btnNext = document.getElementById('btn-radio-next');
+    const volSlider = document.getElementById('radio-volume');
+    const stationList = document.getElementById('station-list');
+    const radioFilters = document.getElementById('radio-filters');
+    const txtName = document.getElementById('radio-station-name');
+    const txtCountry = document.getElementById('radio-country');
+
+    // Initialize Filters
+    if(radioFilters) {
+        const countries = [...new Set(stations.map(s => JSON.stringify({name: s.country, flag: s.flag})))].map(s => JSON.parse(s));
+        countries.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-outline-light rounded-pill px-3 me-2';
+            btn.textContent = `${c.flag} ${c.name}`;
+            btn.dataset.filter = c.name;
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#radio-filters button').forEach(b => { b.classList.remove('active'); b.classList.add('btn-outline-light'); });
+                btn.classList.add('active'); btn.classList.remove('btn-outline-light');
+                renderList(c.name);
+            });
+            radioFilters.appendChild(btn);
+        });
+        const allBtn = radioFilters.querySelector('[data-filter="all"]');
+        if(allBtn) {
+            allBtn.addEventListener('click', () => {
+                document.querySelectorAll('#radio-filters button').forEach(b => { b.classList.remove('active'); b.classList.add('btn-outline-light'); });
+                allBtn.classList.add('active'); allBtn.classList.remove('btn-outline-light');
+                renderList('all');
+            });
+        }
+    }
+
+    function renderList(filter) {
+        activeFilter = filter;
+        stationList.innerHTML = '';
+        stations.forEach((s, idx) => {
+            if(filter !== 'all' && s.country !== filter) return;
+            const item = document.createElement('button');
+            item.className = `list-group-item list-group-item-action radio-item p-3 d-flex align-items-center justify-content-between ${idx === currentIdx ? 'active' : ''}`;
+            item.innerHTML = `<div class="d-flex align-items-center"><span class="badge bg-light text-dark me-3 rounded-pill" style="width:35px;">${idx + 1}</span><div class="text-start"><div class="fw-bold">${s.name}</div><small style="opacity:0.8">${s.flag} ${s.country} • ${s.genre}</small></div></div><i class="bi bi-play-circle fs-4 opacity-50"></i>`;
+            item.addEventListener('click', () => loadStation(idx, true));
+            stationList.appendChild(item);
+        });
+    }
+
+    function loadStation(index, autoPlay = false) {
+        currentIdx = index;
+        const s = stations[index];
+        txtName.textContent = s.name;
+        txtCountry.innerHTML = `${s.flag} ${s.country} • ${s.genre}`;
+        renderList(activeFilter); 
+        audio.src = s.url;
+        if(autoPlay) playRadio();
+        else { pauseRadio(); btnPlay.innerHTML = '<i class="bi bi-play-fill fs-1 ms-1"></i>'; }
+    }
+
+    function playRadio() {
+        audio.play().then(() => { isPlaying = true; btnPlay.innerHTML = '<i class="bi bi-pause-fill fs-1"></i>'; })
+        .catch(e => { console.error("Stream Error:", e); isPlaying = false; btnPlay.innerHTML = '<i class="bi bi-play-fill fs-1 ms-1"></i>'; });
+    }
+    function pauseRadio() { audio.pause(); isPlaying = false; btnPlay.innerHTML = '<i class="bi bi-play-fill fs-1 ms-1"></i>'; }
+    function togglePlay() { if(isPlaying) pauseRadio(); else { if(!audio.src) loadStation(0); playRadio(); } }
+
+    if(btnPlay) btnPlay.addEventListener('click', togglePlay);
+    if(btnPrev) btnPrev.addEventListener('click', () => { let newIdx = currentIdx - 1; if(newIdx < 0) newIdx = stations.length - 1; loadStation(newIdx, isPlaying); });
+    if(btnNext) btnNext.addEventListener('click', () => { let newIdx = currentIdx + 1; if(newIdx >= stations.length) newIdx = 0; loadStation(newIdx, isPlaying); });
+    if(volSlider) volSlider.addEventListener('input', (e) => { audio.volume = e.target.value; });
+
+    // THREE.JS GLOBE
+    let scene, camera, renderer, globeGroup;
+    function initGlobe() {
+        const container = document.getElementById('globe-container');
+        if(!container) return;
+        
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.z = 12; 
+
+        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        globeGroup = new THREE.Group();
+        scene.add(globeGroup);
+
+        const geometry = new THREE.SphereGeometry(4, 64, 64);
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/1024px-Blue_Marble_2002.png');
+        const material = new THREE.MeshPhongMaterial({ map: texture });
+        const earth = new THREE.Mesh(geometry, material);
+        globeGroup.add(earth);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 0.5);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        stations.forEach((s, i) => {
+            const phi = (90 - s.lat) * (Math.PI / 180);
+            const theta = (s.lon + 180) * (Math.PI / 180);
+            const x = -(4.1 * Math.sin(phi) * Math.cos(theta));
+            const z = (4.1 * Math.sin(phi) * Math.sin(theta));
+            const y = (4.1 * Math.cos(phi));
+
+            const markerGeo = new THREE.SphereGeometry(0.15, 16, 16);
+            const markerMat = new THREE.MeshBasicMaterial({ color: 0x84fab0 }); 
+            const marker = new THREE.Mesh(markerGeo, markerMat);
+            marker.position.set(x, y, z);
+            marker.userData = { id: i };
+            globeGroup.add(marker);
+        });
+
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        container.addEventListener('mousedown', (e) => { isDragging = true; });
+        container.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y };
+                globeGroup.rotation.y += deltaMove.x * 0.005;
+                globeGroup.rotation.x += deltaMove.y * 0.005;
+            }
+            previousMousePosition = { x: e.offsetX, y: e.offsetY };
+        });
+        container.addEventListener('mouseup', () => { isDragging = false; });
+        
+        container.addEventListener('click', (event) => {
+            if(isDragging) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(globeGroup.children);
+            
+            for (let i = 0; i < intersects.length; i++) {
+                if (intersects[i].object.userData.id !== undefined) {
+                    loadStation(intersects[i].object.userData.id, true);
+                    return; 
+                }
+            }
+        });
+        animate();
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if(!isPlaying) globeGroup.rotation.y += 0.001; 
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('load', initGlobe);
+    renderList('all');
+    if(stations.length > 0) loadStation(0, false);
+
+  })();
+  
+  /* --- 10. 3D Particle Background (Artistic Version) --- */
+  (function(){
+    const bgContainer = document.getElementById('canvas-bg');
+    if(bgContainer) {
+        const scene = new THREE.Scene();
+        // ลด Field of View ลงเล็กน้อยเพื่อให้ดูนุ่มนวลขึ้น
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        bgContainer.appendChild(renderer.domElement);
+
+        // สร้าง Geometry
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 600; // จำนวน particles
+        const posArray = new Float32Array(particlesCount * 3);
+        const colorsArray = new Float32Array(particlesCount * 3);
+
+        // Palette สีสไตล์ศิลปิน (ชมพู, ม่วง, ฟ้าอมเขียว, พีช, ฟ้าอ่อน)
+        const palette = [
+            new THREE.Color("#FF9A9E"), // Primary Pink
+            new THREE.Color("#A18CD1"), // Secondary Purple
+            new THREE.Color("#84FAB0"), // Accent Mint
+            new THREE.Color("#fad0c4"), // Soft Peach
+            new THREE.Color("#a1c4fd")  // Soft Blue
+        ];
+
+        for(let i = 0; i < particlesCount; i++) {
+            // ตำแหน่งกระจายตัวกว้างๆ
+            posArray[i * 3 + 0] = (Math.random() - 0.5) * 20;
+            posArray[i * 3 + 1] = (Math.random() - 0.5) * 20;
+            posArray[i * 3 + 2] = (Math.random() - 0.5) * 15;
+            
+            // สุ่มสีจาก Palette
+            const color = palette[Math.floor(Math.random() * palette.length)];
+            colorsArray[i * 3 + 0] = color.r;
+            colorsArray[i * 3 + 1] = color.g;
+            colorsArray[i * 3 + 2] = color.b;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+
+        // สร้าง Material แบบใช้สี Vertex และทำให้ดูนุ่มขึ้น
+        const material = new THREE.PointsMaterial({
+            size: 0.12, // เพิ่มขนาดให้ดูเหมือนพู่กันแต้ม
+            vertexColors: true, // ใช้สีที่กำหนดเอง
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending, // ทำให้ดูสว่างและฟุ้ง
+            depthWrite: false
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+        camera.position.z = 5;
+
+        let mouseX = 0; let mouseY = 0;
+        let targetX = 0; let targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        });
+
+        const animateBg = () => {
+            targetX = mouseX * 0.0003;
+            targetY = mouseY * 0.0003;
+            
+            // เพิ่มการหมุนให้ดูมีความเคลื่อนไหวแบบอาร์ตๆ
+            particlesMesh.rotation.y += 0.0008; 
+            particlesMesh.rotation.z += 0.0004;
+
+            particlesMesh.rotation.x += 0.03 * (targetY - particlesMesh.rotation.x);
+            particlesMesh.rotation.y += 0.03 * (targetX - particlesMesh.rotation.y);
+            
+            renderer.render(scene, camera);
+            requestAnimationFrame(animateBg);
+        };
+        animateBg();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    }
+  })();
+</script>
+<script>
+  /* --- Local Storage Chat System (ไม่ต้องใช้ Server) --- */
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatContainer = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const nameInput = document.getElementById('chat-name');
+    const msgInput = document.getElementById('chat-input');
+    const badWords = ['กู', 'มึง', 'สัส', 'เหี้ย', 'ควาย', 'ควย', 'เย็ด', 'shit', 'fuck', 'damn', 'bitch'];
+
+    // 1. โหลดข้อมูลเก่าจากเครื่อง
+    const loadMessages = () => {
+        const storedData = localStorage.getItem('artistHub_chat');
+        let posts = storedData ? JSON.parse(storedData) : [];
+
+        // ถ้าไม่มีข้อความเลย ให้สร้างข้อความทักทาย
+        if (posts.length === 0) {
+            posts = [
+                { name: "Admin", message: "ยินดีต้อนรับสู่ Fan Zone! แปะโพสต์อิททักทายกันได้เลยครับ", timestamp: Date.now() },
+                { name: "SIT Student", message: "เว็บสวยมากครับ รอติดตามผลงาน!", timestamp: Date.now() }
+            ];
+            localStorage.setItem('artistHub_chat', JSON.stringify(posts));
+        }
+
+        // เรียงลำดับ (ใหม่สุดอยู่ท้าย) -> แต่ตอนแสดงผลเราอยากให้เห็นอันใหม่ๆ
+        // ตัดมาแค่ 8 ข้อความล่าสุด
+        const recentPosts = posts.slice(-8);
+
+        chatContainer.innerHTML = '';
+        recentPosts.forEach(post => {
+            const div = document.createElement('div');
+            div.className = 'post-it animate__animated animate__zoomIn';
+            // สุ่มองศาเอียงๆ ให้ดูเหมือนแปะกระดาษ
+            const rotate = Math.floor(Math.random() * 6) - 3; 
+            div.style.transform = `rotate(${rotate}deg)`;
+            
+            // สร้างสีพื้นหลังสุ่มๆ (พาสเทล)
+            const colors = ['#ffe5d9', '#e0c3fc', '#d0f4de', '#a9def9', '#ffcfd2'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            div.style.background = randomColor;
+
+            div.innerHTML = `
+                <div class="fw-bold text-dark text-truncate" style="max-width:100%; font-size:0.9rem;">
+                    <i class="bi bi-pin-angle-fill text-danger me-1"></i>${post.name}
+                </div>
+                <hr style="margin:5px 0; opacity:0.3;">
+                <div style="word-wrap: break-word; color:#555;">${post.message}</div>
+            `;
+            chatContainer.appendChild(div);
+        });
+    };
+
+    // 2. บันทึกข้อความใหม่
+    if(chatForm) {
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = nameInput.value.trim();
+            const msg = msgInput.value.trim();
+
+            if (!name || !msg) return;
+
+            // กรองคำหยาบ
+            if (badWords.some(w => name.toLowerCase().includes(w) || msg.toLowerCase().includes(w))) {
+                alert("ขออภัยครับ ข้อความมีคำไม่สุภาพ");
+                return;
+            }
+
+            const newPost = {
+                name: name,
+                message: msg,
+                timestamp: Date.now()
+            };
+
+            // ดึงข้อมูลเก่ามา + ใส่ของใหม่เข้าไป
+            const storedData = localStorage.getItem('artistHub_chat');
+            const posts = storedData ? JSON.parse(storedData) : [];
+            posts.push(newPost);
+
+            // บันทึกลงเครื่อง
+            localStorage.setItem('artistHub_chat', JSON.stringify(posts));
+
+            // เคลียร์ช่องพิมพ์และโหลดใหม่
+            msgInput.value = '';
+            loadMessages();
+        });
+    }
+
+    // เริ่มทำงานทันที
+    loadMessages();
+  });
 </script>
 </body>
 </html>
