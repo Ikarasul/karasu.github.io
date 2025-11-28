@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ArtistHub - Discover Art & Artists</title>
+
+  <link rel="icon" href="https://github.com/Ikarasul/karasu.github.io/blob/main/img/Logo%20SPU%20SIT_White.png?raw=true" type="image/png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&family=Caveat:wght@400;700&family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div id="canvas-bg"></div>
+
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand animate__animated animate__fadeInLeft" href="#home"><img id="mainLogo" src="https://github.com/Ikarasul/karasu.github.io/blob/main/img/Logo%20SPU%20SIT_Color.png?raw=true" data-light="https://github.com/Ikarasul/karasu.github.io/blob/main/img/Logo%20SPU%20SIT_Color.png?raw=true" data-dark="https://github.com/Ikarasul/karasu.github.io/blob/main/img/Logo%20SPU%20SIT_White.png?raw=true" height="48" style="transition:0.3s" alt="Logo">
+      <span class="brand-text ms-2">ArtistHub</span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <div class="bg-secondary rounded-circle p-2 text-white"><i class="bi bi-list fs-4"></i></div>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto align-items-lg-center animate__animated animate__fadeInRight">
+        <li class="nav-item"><a class="nav-link active" href="#home">หน้าหลัก</a></li>
+        <li class="nav-item"><a class="nav-link nav-tab" href="#artists">ศิลปิน</a></li>
+        <li class="nav-item"><a class="nav-link nav-tab" href="#ai-guru">AI Guru</a></li>
+        <li class="nav-item"><a class="nav-link nav-tab" href="#submit">เสนอรายชื่อ</a></li>
+        <li class="nav-item"><a class="nav-link nav-tab" href="#members">ผู้จัดทำ</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section id="home" class="hero container reveal">
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="glass-panel p-0 overflow-hidden position-relative shadow-lg" style="border: 2px solid #fff;">
+         <div style="position:absolute; top:-50px; right:-50px; width:400px; height:400px; background:radial-gradient(circle, rgba(108, 92, 231, 0.2) 0%, transparent 70%); border-radius:50%; z-index:0;"></div>
+         <div class="row g-0 align-items-center position-relative" style="z-index:1;">
+           <div class="col-md-6 col-lg-5">
+              <div style="height: 100%; min-height: 420px; overflow: hidden;">
+                <img id="hero-img" src="" alt="Artist Highlight" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: 0.8s ease-in-out;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+              </div>
+           </div>
+           <div class="col-md-6 col-lg-7 p-4 p-md-5">
+              <div class="d-flex align-items-center mb-3">
+                <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm animate__animated animate__pulse animate__infinite"><i class="bi bi-fire me-1"></i> Hot Pick</span>
+                <span id="hero-genre" class="ms-3 text-muted small text-uppercase fw-bold" style="letter-spacing: 2px;">GENRE</span>
+              </div>
+              <h1 id="hero-name" class="fw-bold display-4 mb-1" style="font-family: 'Bai Jamjuree'; color: #2d3436;">Artist Name</h1>
+              <h2 id="hero-headline" class="fw-bold mb-3" style="background: linear-gradient(45deg, #6c5ce7, #ff7675); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Bai Jamjuree';">Headline</h2>
+              <p id="hero-desc" class="text-muted fs-5 mb-4" style="line-height: 1.6;">Description...</p>
+              <button id="hero-btn" class="btn btn-dark rounded-pill px-4 py-2 shadow hover-scale"><i class="bi bi-play-circle-fill me-2"></i> ดูข้อมูลศิลปิน</button>
+           </div>
+         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="artists" class="py-5 position-relative reveal">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-5">
+      <div>
+        <h2 class="section-title mb-0" data-text="ศิลปินแนะนำ">ศิลปินแนะนำ</h2>
+        <p class="text-muted mt-2 mb-0 fs-5">ศิลปินที่มีผลงานโดดเด่นและน่าจับตามอง</p>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="artist-sidebar h-100">
+          
+          <div class="d-flex gap-2 mb-3">
+             <div class="position-relative flex-grow-1">
+                <i class="bi bi-search position-absolute text-muted" style="top:12px; left:15px;"></i>
+                <input type="text" id="artistSearch" class="form-control rounded-pill shadow-sm ps-5" placeholder="ค้นหาศิลปิน..." style="border:1px solid #eee;">
+             </div>
+             <button id="btnSortAZ" class="btn btn-light rounded-circle shadow-sm" title="เรียงตามตัวอักษร" style="width:42px; height:42px; color:var(--secondary);"><i class="bi bi-sort-alpha-down"></i></button>
+          </div>
+
+          <div class="d-flex align-items-center mb-4 px-2">
+            <div class="bg-warning rounded-circle p-2 me-3 text-white shadow-sm"><i class="bi bi-stars fs-5"></i></div>
+            <span class="fw-bold text-uppercase text-muted" style="letter-spacing: 1.5px;">Directory</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 px-2 mb-4" id="artistFilters">
+            <div class="filter-chip active" data-filter="all">ทั้งหมด</div>
+            <div class="filter-chip" data-filter="thai">🇹🇭 ไทย</div>
+            <div class="filter-chip" data-filter="korea">🇰🇷 เกาหลี</div>
+            <div class="filter-chip" data-filter="western">🇺🇸 สากล</div>
+            <div class="filter-chip" data-filter="japan">🇯🇵 ญี่ปุ่น</div>
+            <div class="filter-chip" data-filter="china">CHN ศิลปินจีน</div>
+          </div>
+          
+          <div id="artistList" class="overflow-visible pe-2">
+             
+             <div class="artist-group-header" data-group="thai">🇹🇭 ศิลปินไทย</div>
+
+             <button class="artist-btn active" data-group="thai" data-name="Three Man Down" data-country="ไทย" data-style="Pop Rock" 
+                 data-photo="https://s359.kapook.com/pagebuilder/3374c3be-fea4-4b52-afb8-3f0c5b63cb26.jpg" 
+                 data-bio="<strong>สมาชิก:</strong> กฤตย์ จีรพัฒนานุวงศ์<br><strong>แนวเพลง:</strong> Pop Rock<br><strong>ค่ายปัจจุบัน:</strong> Gene Lab<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>วงป๊อปร็อกหน้าใหม่ที่มาแรงที่สุด</li><li>เจ้าของเพลงฮิตที่กวาดยอดวิวถล่มทลาย</li><li>การแสดงสดที่มันส์สุดเหวี่ยง</li></ul><strong>เพลงฮิต</strong><ul><li>ฝนตกไหม</li><li>ถ้าเธอรักฉันจริง</li></ul>" 
+                 data-extra='{"youtube":[{"title":"ฝนตกไหม - Official MV","url":"https://www.youtube.com/watch?v=ENnGPkhVu2g&list=RDENnGPkhVu2g&start_radio=1"},{"title":"น้อง","url":"https://www.youtube.com/watch?v=VVs5UHgafv8&list=RDVVs5UHgafv8&start_radio=1"}],"apple":[{"title":"Three Man Down","url":"https://music.apple.com/th/artist/three-man-down/1066898695"}]}'>
+                 <img src="https://www.unlockmen.com/wp-content/uploads/2023/08/230811-Toon-Three-Man-Down-for-web-10.jpg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">Three Man Down</div><div class="artist-info-sm">Thailand • Pop Rock</div></div>
+             </button>
+             
+             <button class="artist-btn" data-group="thai" data-name="BOWKYLION" data-country="ไทย" data-style="Pop / Indie" 
+                 data-photo="https://media.atime.live/content/c7a34615-d6a7-43ab-a59d-17b3bae0c99e.jpeg" 
+                 data-bio="<strong>ชื่อจริง:</strong> พิชญ์สินี วีระสุทธิมาศ<br><strong>ชื่อเล่น:</strong> โบกี้<br><strong>เกิด:</strong> 8 มิถุนายน พ.ศ. 2537<br><strong>บ้านเกิด:</strong> กรุงเทพมหานคร<br><strong>การศึกษา:</strong> มหาวิทยาลัยธรรมศาสตร์<br><strong>ค่ายปัจจุบัน:</strong> What The Duck<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เริ่มต้นจากการร้องคัฟเวอร์ลง YouTube</li><li>เข้าประกวด The Voice Thailand Season 1 (2555)</li><li>มีสไตล์อินดี้–ป๊อป เสียงร้องมีเอกลักษณ์</li></ul><strong>เพลงฮิต</strong><ul><li>คิดถึงแต่ (Just Wondering)</li><li>เพื่อนเล่น ไม่เล่นเพื่อน</li><li>วาดไว้</li><li>คงคา</li><li>ลงใจ</li><li>ท้องฟ้า</li></ul>" 
+                 data-extra='{"youtube":[{"title":"บานปลาย","url":"https://www.youtube.com/watch?v=RzttASVRHAI"},{"title":"วาดไว้","url":"https://www.youtube.com/watch?v=a0M_QUS3kC0&list=RDa0M_QUS3kC0&start_radio=1"}],"apple":[{"title":"BOWKYLION","url":"https://music.apple.com/th/artist/bowkylion/1193225731"}]}'>
+                 <img src="https://media.atime.live/content/c7a34615-d6a7-43ab-a59d-17b3bae0c99e.jpeg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">BOWKYLION</div><div class="artist-info-sm">Thailand • Pop</div></div>
+             </button>
+             
+             <button class="artist-btn" data-group="thai" data-name="NONT TANONT" data-country="ไทย" data-style="Pop / R&B" 
+                 data-photo="https://upload.wikimedia.org/wikipedia/commons/7/7e/CoolpuiLiam191996.jpg" 
+                 data-bio="<strong>ชื่อจริง:</strong> ธนนท์ จำเริญ<br><strong>ชื่อในวงการ:</strong> นนท์ ธนนท์ (NONT TANONT)<br><strong>อาชีพ:</strong> นักร้อง / นักแสดง<br><strong>ค่ายปัจจุบัน:</strong> LOVEiS Entertainment<br><strong>จุดเด่น:</strong> โทนเสียงอุ่น นุ่ม ละมุน ร้องสดดีมาก<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>ผู้ชนะรายการ The Voice Thailand Season 1</li></ul><strong>เพลงฮิต</strong><ul><li>คืนที่หมาเต็มวัด</li><li>พิง</li><li>โต๊ะริม</li></ul>" 
+                 data-extra='{"youtube":[{"title":"โต๊ะริม (Melt)","url":"https://www.youtube.com/watch?v=XqQMisU5En8&list=RDXqQMisU5En8&start_radio=1"},{"title":"พิง","url":"https://www.youtube.com/watch?v=-tCPuOIeSHo&list=RD-tCPuOIeSHo&start_radio=1"}],"apple":[{"title":"NONT TANONT","url":"https://music.apple.com/th/artist/nont-tanont/671377502?l=th"}]}'>
+                 <img src="https://www.sunshinefm.com/pix/whatsnews/tn-1961-902.jpg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">NONT TANONT</div><div class="artist-info-sm">Thailand • Pop</div></div>
+             </button>
+             
+             <button class="artist-btn" data-group="thai" data-name="Ink Waruntorn" data-country="ไทย" data-style="Synth-Pop" 
+                 data-photo="https://storage.googleapis.com/atime-media-prod/editor/content/244dd612-48f4-46a0-a7cb-673650a5ff76.jpeg" 
+                 data-bio="<strong>ชื่อจริง:</strong> วรันธร เปานิล (Waruntorn Paonil)<br><strong>ชื่อในวงการ:</strong> Ink Waruntorn<br><strong>เกิด:</strong> 23 กุมภาพันธ์ 1994<br><strong>ภูมิลำเนา:</strong> กรุงเทพฯ<br><strong>แนวเพลง:</strong> Synth-Pop / R&B / Soul<br><strong>ค่ายปัจจุบัน:</strong> BOXX MUSIC<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เริ่มเดบิวต์ในวงการตั้งแต่ปี 2006 (Kamikaze)</li><li>เป็นศิลปินเดี่ยวค่าย BOXX MUSIC ตั้งแต่ปี 2015</li></ul><strong>เพลงฮิต</strong><ul><li>สายตาหลอกกันไม่ได้</li><li>เกี่ยวกันไหม</li><li>ดีใจด้วยนะ</li></ul>" 
+                 data-extra='{"youtube":[{"title":"สายตาหลอกกันไม่ได้","url":"https://www.youtube.com/watch?v=C-Edz_RXi8E"},{"title":"เกี่ยวกันไหม","url":"https://www.youtube.com/watch?v=kRRrsIUxPpM&list=RDkRRrsIUxPpM&start_radio=1"}],"apple":[{"title":"Ink Waruntorn","url":"https://music.apple.com/th/artist/ink-waruntorn/1068038828"}]}'>
+                 <img src="https://yt3.googleusercontent.com/Fn6THjnRY5HNH6-Otij1SeOI5bR1ps993kGlmaUfoGJiuXvV5WJsSQBDDLeDJWG6hChy11jaZcA%3Ds900-c-k-c0x00ffffff-no-rj" class="artist-avatar" alt="">
+                 <div><div class="artist-name">Ink Waruntorn</div><div class="artist-info-sm">Thailand • Synth-Pop</div></div>
+             </button>
+             
+             <button class="artist-btn" data-group="thai" data-name="Blackbeans (Boom)" data-country="ไทย" data-style="Indie-Pop" 
+                 data-photo="https://cdn.prod.website-files.com/649174dcab676e52a64ce81a/64ca16fdea17607b7c0a6d35_n4XCbiFEBto6nLVEfF9EiomrokHdXwkKOwjxwiXBnJdOEN0LfgAaWlwN0HQAYCP_q5BKeNVgMbEs6MeylRhdmk52IteFnzdYeXR6NWxl34Nvk_8zVoHczzhHRLOix6YZUq83GBH_NWgoxBGt8VIKpeI.jpeg" 
+                 data-img-pos="center center" 
+                 data-bio="<strong>ชื่อจริง:</strong> พีรวิทย์ จิตการุณ (บูม)<br><strong>ตำแหน่ง:</strong> นักร้องนำวง Blackbeans<br><strong>แนวเพลง:</strong> Indie-Pop / Alternative Pop<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เริ่มก่อตั้งวงปี 2013 จากกลุ่มเพื่อนมัธยม</li><li>เติบโตอย่างสวยงามในวงการเพลงอินดี้ไทย</li></ul><strong>เพลงฮิต</strong><ul><li>Wish</li><li>You</li><li>Moon</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Wish","url":"https://www.youtube.com/watch?v=UHpJzCd_lXo"},{"title":"You","url":"https://www.youtube.com/watch?v=CRvLi-xc6_E"},{"title":"Moon","url":"https://www.youtube.com/watch?v=GnQZmNf9KCg"}],"apple":[{"title":"Blackbeans","url":"https://music.apple.com/th/artist/blackbeans/1383298789?l=th"}]}'>
+                 <img src="https://cdn.prod.website-files.com/649174dcab676e52a64ce81a/64ca16fdea17607b7c0a6d35_n4XCbiFEBto6nLVEfF9EiomrokHdXwkKOwjxwiXBnJdOEN0LfgAaWlwN0HQAYCP_q5BKeNVgMbEs6MeylRhdmk52IteFnzdYeXR6NWxl34Nvk_8zVoHczzhHRLOix6YZUq83GBH_NWgoxBGt8VIKpeI.jpeg" class="artist-avatar" style="object-position: center center;" alt="">
+                 <div><div class="artist-name">Blackbeans (Boom)</div><div class="artist-info-sm">Thailand • Indie-Pop</div></div>
+             </button>
+             
+             <div class="artist-group-header" data-group="china">CHN ศิลปินจีน</div>
+
+             <button class="artist-btn" data-group="china" data-name="Sunnee (ซันนี่)" data-country="ไทย/จีน" data-style="C-Pop / R&B" 
+                 data-photo="https://s.isanook.com/jo/0/ui/486/2433625/sunnee_press_image_04.jpg" 
+                 data-bio="<strong>ชื่อจริง:</strong> Sunnee (Yang Yun-qing / 杨芸晴)<br><strong>เชื้อชาติ:</strong> ไทย-จีน (เกิดที่ไทย)<br><strong>บ้านเกิด:</strong> กรุงเทพมหานคร<br><strong>แนวเพลง:</strong> C-Pop, Mandopop, R&B<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เดบิวต์จากรายการเซอร์ไววัลจีน 'Produce 101 China'</li><li>เป็นหนึ่งในสมาชิกวงเกิร์ลกรุ๊ปชื่อดัง 'Rocket Girls 101'</li></ul><strong>ผลงานเด่น</strong><ul><li>Sunnee MV</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Sunnee MV","url":"https://youtu.be/5siJzY4rTVc"}],"apple":[{"title":"Sunnee","url":"https://music.apple.com/th/artist/sunnee%E6%9D%A8%E8%8A%B9%E6%99%B4/1825350744"}]}'>
+                 <img src="https://s.isanook.com/jo/0/ui/486/2433625/sunnee_press_image_04.jpg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">Sunnee (ซันนี่)</div><div class="artist-info-sm">Thai/China • C-Pop</div></div>
+             </button>
+
+             <div class="artist-group-header" data-group="korea">🇰🇷 ศิลปินเกาหลี</div>
+
+             <button class="artist-btn" data-group="korea" data-name="JISOO (จีซู)" data-country="เกาหลีใต้" data-style="K-Pop" 
+                 data-photo="https://storage.googleapis.com/atime-media-prod/editor/content/b66de03e-b3ec-4b96-ad4e-3c0059f71b53.jpeg" 
+                 data-bio="<strong>ชื่อจริง:</strong> คิม จีซู (Kim Ji-soo)<br><strong>เกิด:</strong> 3 มกราคม 1995<br><strong>ค่ายปัจจุบัน:</strong> BLISSOO / YG<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>พี่ใหญ่ของวง รับตำแหน่งนักร้องนำ (Lead Vocalist) และภาพลักษณ์ของวง (Visual)</li><li>เข้าวงการจากการเป็นศิลปินฝึกหัด และมีผลงานโฆษณา/MV ก่อนเดบิวต์</li><li>มีผลงานการแสดงซีรีส์ (Snowdrop) ควบคู่ไปกับงานเพลง</li></ul><strong>เพลงฮิต (Solo)</strong><ul><li>FLOWER</li><li>All Eyes On Me</li></ul>" 
+                 data-extra='{"youtube":[{"title":"FLOWER (Official MV)","url":"https://www.youtube.com/watch?v=YudHcBIxlYw"},{"title":"All Eyes On Me (Official Audio)","url":"https://www.youtube.com/watch?v=32H6ELy88uE"}],"apple":[{"title":"JISOO","url":"https://music.apple.com/th/artist/jisoo/1676647895"}]}'>
+                 <img src="https://storage.googleapis.com/atime-media-prod/editor/content/b66de03e-b3ec-4b96-ad4e-3c0059f71b53.jpeg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">JISOO (จีซู)</div><div class="artist-info-sm">Korea • K-Pop</div></div>
+             </button>
+
+             <button class="artist-btn" data-group="korea" data-name="JENNIE (เจนนี่)" data-country="เกาหลีใต้" data-style="K-Pop / Rap" 
+                 data-photo="https://s359.kapook.com/pagebuilder/4fdb44ce-b4cf-4561-ad61-35a2b8d0069a.jpg" 
+                 data-bio="<strong>ชื่อจริง:</strong> คิม เจนนี่ (Kim Jennie)<br><strong>เกิด:</strong> 16 มกราคม 1996<br><strong>ค่ายปัจจุบัน:</strong> ODDATELIER (OA) / YG<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>รับตำแหน่งแร็ปเปอร์หลัก (Main Rapper) และนักร้องนำ (Lead Vocalist)</li><li>เป็นสมาชิกคนแรกของวงที่มีผลงานเดี่ยว (Solo)</li><li>มีความโดดเด่นด้านแฟชั่นและคาแรคเตอร์ที่มั่นใจ</li></ul><strong>เพลงฮิต (Solo)</strong><ul><li>Mantra</li><li>SOLO</li><li>You & Me</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Mantra (Official MV)","url":"https://www.youtube.com/watch?v=HI9lNAa439c"},{"title":"SOLO","url":"https://www.youtube.com/watch?v=b73BI9eUkjM"},{"title":"You & Me (Dance Performance)","url":"https://www.youtube.com/watch?v=GBV5d7u57V0"}],"apple":[{"title":"JENNIE","url":"https://music.apple.com/th/artist/jennie/1441656966"}]}'>
+                 <img src="https://s359.kapook.com/pagebuilder/4fdb44ce-b4cf-4561-ad61-35a2b8d0069a.jpg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">JENNIE (เจนนี่)</div><div class="artist-info-sm">Korea • K-Pop</div></div>
+             </button>
+
+             <button class="artist-btn" data-group="korea" data-name="ROSÉ (โรเซ่)" data-country="เกาหลีใต้" data-style="K-Pop / Indie Pop" 
+                 data-photo="https://i.namu.wiki/i/fjnLZhByeJypmPtNpoH0W6BnJFw7l3AyZVH9LdhsQOdJWZS5jDSOCaE37ochEp4rvje_IgOfP1A36aMwcNvZcg.webp" 
+                 data-bio="<strong>ชื่อจริง:</strong> พัค แชยอง (Park Chae-young)<br><strong>เกิด:</strong> 11 กุมภาพันธ์ 1997<br><strong>ค่ายปัจจุบัน:</strong> THE BLACK LABEL / YG<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>รับตำแหน่งนักร้องเสียงหลัก (Main Vocalist) และนักเต้นนำ (Lead Dancer)</li><li>มีเนื้อเสียงที่เป็นเอกลักษณ์และสามารถเล่นกีตาร์/เปียโนได้</li><li>ผ่านการออดิชั่นจากออสเตรเลียและฝึกฝนอย่างหนักจนได้เดบิวต์</li></ul><strong>เพลงฮิต (Solo)</strong><ul><li>APT.</li><li>On The Ground</li><li>Gone</li></ul>" 
+                 data-extra='{"youtube":[{"title":"APT. (Official MV)","url":"https://www.youtube.com/watch?v=ekr2nIex040"},{"title":"On The Ground","url":"https://youtu.be/CKZvWhCqx1s"}],"apple":[{"title":"ROSÉ","url":"https://music.apple.com/cd/artist/ros%C3%A9/1406242696"}]}'>
+                 <img src="https://i.namu.wiki/i/fjnLZhByeJypmPtNpoH0W6BnJFw7l3AyZVH9LdhsQOdJWZS5jDSOCaE37ochEp4rvje_IgOfP1A36aMwcNvZcg.webp" class="artist-avatar" alt="">
+                 <div><div class="artist-name">ROSÉ (โรเซ่)</div><div class="artist-info-sm">Korea • K-Pop</div></div>
+             </button>
+
+             <button class="artist-btn" data-group="korea" data-name="LISA (ลิซ่า)" data-country="ไทย/เกาหลี" data-style="Hip-Hop / K-Pop" 
+                 data-photo="https://s.isanook.com/ca/0/ud/278/1393297/lalalalisa_m-20240603_163133-.jpg?ip/resize/w728/q80/jpg" 
+                 data-bio="<strong>ชื่อจริง:</strong> ลลษา มโนบาล (Lalisa Manobal)<br><strong>เกิด:</strong> 27 มีนาคม 1997<br><strong>บ้านเกิด:</strong> บุรีรัมย์, ไทย<br><strong>ค่ายปัจจุบัน:</strong> LLOUD / YG<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>รับตำแหน่งนักเต้นหลัก (Main Dancer) และแร็ปเปอร์นำ (Lead Rapper)</li><li>เป็นศิลปินต่างชาติคนแรกในค่าย YG Entertainment</li><li>มีอิทธิพลระดับโลกทั้งด้านการเต้นและวงการแฟชั่น</li></ul><strong>เพลงฮิต (Solo)</strong><ul><li>Rockstar</li><li>New Woman</li><li>LALISA</li><li>MONEY</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Rockstar (Official MV)","url":"https://www.youtube.com/watch?v=-AIzz0daVC8"},{"title":"New Woman (Official MV)","url":"https://www.youtube.com/watch?v=UxXY_hR_wzo&list=RDUxXY_hR_wzo&start_radio=1"},{"title":"LALISA","url":"https://www.youtube.com/watch?v=awkkyBH2zEo"}],"apple":[{"title":"LISA","url":"https://music.apple.com/th/artist/lisa/1584803730"}]}'>
+                 <img src="https://s.isanook.com/ca/0/ud/278/1393297/lalalalisa_m-20240603_163133-.jpg?ip/resize/w728/q80/jpg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">LISA (ลิซ่า)</div><div class="artist-info-sm">Thai/Korea • Hip-Hop</div></div>
+             </button>
+
+             <div class="artist-group-header" data-group="western">🇺🇸 ศิลปินสากล</div>
+
+             <button class="artist-btn" data-group="western" data-name="Adam Levine" data-country="USA" data-style="Pop Rock" 
+                 data-photo="https://wwd.com/wp-content/uploads/2018/05/adam-levine_official-portraitc2a9loicpeoch.jpg?w=1000&h=563&crop=1" 
+                 data-bio="<strong>ชื่อจริง:</strong> Adam Noah Levine<br><strong>เกิด:</strong> 18 มีนาคม 1979<br><strong>ตำแหน่ง:</strong> นักร้องนำ Maroon 5<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เริ่มต้นตั้งวงในชื่อ 'Kara's Flowers' ก่อนเปลี่ยนเป็น 'Maroon 5'</li><li>โดดเด่นด้วยเสียงร้องโทนสูง (High Tenor) และเสียงหลบ (Falsetto)</li><li>เป็นโค้ชรายการ The Voice US (Season 1–16) ที่ได้รับความนิยมสูง</li></ul><strong>เพลงฮิต</strong><ul><li>Moves Like Jagger</li><li>Sugar</li><li>She Will Be Loved</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Moves Like Jagger","url":"https://www.youtube.com/watch?v=iEPTlhBmwRg"},{"title":"Sugar","url":"https://www.youtube.com/watch?v=09R8_2nJtjg"}],"apple":[{"title":"Maroon 5","url":"https://music.apple.com/us/artist/maroon-5/1798556"}]}'>
+                 <img src="https://wwd.com/wp-content/uploads/2018/05/adam-levine_official-portraitc2a9loicpeoch.jpg?w=1000&h=563&crop=1" class="artist-avatar" alt="">
+                 <div><div class="artist-name">Adam Levine</div><div class="artist-info-sm">USA • Pop Rock</div></div>
+             </button>
+
+             <button class="artist-btn" data-group="western" data-name="Lady Gaga" data-country="USA" data-style="Pop / Electronic" 
+                 data-photo="https://cdn.britannica.com/83/183183-050-A2483D93/Lady-Gaga-2015.jpg" 
+                 data-bio="<strong>ชื่อจริง:</strong> Stefani Joanne Angelina Germanotta<br><strong>เกิด:</strong> 28 มีนาคม 1986<br><strong>ฉายา:</strong> Mother Monster<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>แจ้งเกิดด้วยอัลบั้ม The Fame (2008) กับสไตล์แฟชั่นหลุดโลก</li><li>เป็นไอคอนของ LGBTQ+ และประสบความสำเร็จทั้งงานเพลงและการแสดง</li><li>เจ้าของรางวัลออสการ์สาขาเพลงประกอบภาพยนตร์ยอดเยี่ยม (Shallow)</li></ul><strong>เพลงฮิต</strong><ul><li>Bad Romance</li><li>Poker Face</li><li>Die With A Smile</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Bad Romance","url":"https://www.youtube.com/watch?v=qrO4YZeyl0I"},{"title":"Die With A Smile","url":"https://www.youtube.com/watch?v=kPa7bsKwL-c"}],"apple":[{"title":"Lady Gaga","url":"https://music.apple.com/us/artist/lady-gaga/277293880"}]}'>
+                 <img src="https://cdn.britannica.com/83/183183-050-A2483D93/Lady-Gaga-2015.jpg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">Lady Gaga</div><div class="artist-info-sm">USA • Pop</div></div>
+             </button>
+
+             <button class="artist-btn" data-group="western" data-name="Bruno Mars" data-country="USA" data-style="R&B / Funk" 
+                 data-photo="https://s.isanook.com/jo/0/ud/478/2391373/bruno-mars.jpg?ip/crop/w670h402/q80/jpg" 
+                 data-bio="<strong>ชื่อจริง:</strong> Peter Gene Hernandez<br><strong>เกิด:</strong> 8 ตุลาคม 1985<br><strong>บ้านเกิด:</strong> ฮอนอลูลู, ฮาวาย<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เติบโตในครอบครัวนักดนตรี เริ่มจากการเป็นโปรดิวเซอร์ (The Smeezingtons)</li><li>โดดเด่นด้วยสไตล์ Funk, Soul, R&B ย้อนยุคและการแสดงสดที่ยอดเยี่ยม</li><li>กวาดรางวัล Grammy มากมายและมีเพลงฮิตระดับตำนานเพียบ</li></ul><strong>เพลงฮิต</strong><ul><li>Uptown Funk</li><li>Just the Way You Are</li><li>Die With A Smile</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Uptown Funk","url":"https://www.youtube.com/watch?v=OPf0YbXqDm0"},{"title":"Die With A Smile","url":"https://www.youtube.com/watch?v=kPa7bsKwL-c"}],"apple":[{"title":"Bruno Mars","url":"https://music.apple.com/us/artist/bruno-mars/278873880"}]}'>
+                 <img src="https://s.isanook.com/jo/0/ud/478/2391373/bruno-mars.jpg?ip/crop/w670h402/q80/jpg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">Bruno Mars</div><div class="artist-info-sm">USA • R&B</div></div>
+             </button>
+
+             <button class="artist-btn" data-group="western" data-name="Taylor Swift" data-country="USA" data-style="Pop / Country" 
+                 data-photo="https://freight.cargo.site/t/original/i/e81c27bbe95fc33e5a72a3591bf94db6a7714c39ba290393489ff1ffcfc6a10c/MS_Swift_Taylor_CloseUp.jpg" 
+                 data-bio="<strong>ชื่อจริง:</strong> Taylor Alison Swift<br><strong>เกิด:</strong> 13 ธันวาคม 1989<br><strong>บ้านเกิด:</strong> West Reading, PA, USA<br><strong>สัญชาติ:</strong> อเมริกัน<br><strong>แนวเพลง:</strong> Pop / Country / Indie / Folk<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เริ่มต้นจากแนวคันทรี่ในวัยรุ่น ก่อนเปลี่ยนสู่ป็อปเต็มตัว</li><li>เป็นหนึ่งในศิลปินที่ทรงอิทธิพลที่สุดในยุคปัจจุบัน</li></ul><strong>เพลงฮิต</strong><ul><li>Shake It Off</li><li>Blank Space</li><li>Anti-Hero</li><li>Cruel Summer</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Anti-Hero","url":"https://www.youtube.com/watch?v=b1kbLwvqugk"},{"title":"Cruel Summer","url":"https://youtu.be/ic8j13piAhQ"}],"apple":[{"title":"Taylor Swift","url":"https://music.apple.com/us/artist/taylor-swift/159260351"}]}'>
+                 <img src="https://freight.cargo.site/t/original/i/e81c27bbe95fc33e5a72a3591bf94db6a7714c39ba290393489ff1ffcfc6a10c/MS_Swift_Taylor_CloseUp.jpg" class="artist-avatar" alt="">
+                 <div><div class="artist-name">Taylor Swift</div><div class="artist-info-sm">USA • Pop</div></div>
+             </button>
+             
+             <div class="artist-group-header" data-group="japan">🇯🇵 ศิลปินญี่ปุ่น</div>
+
+             <button class="artist-btn" data-group="japan" data-name="ADO (อาโดะ)" data-country="ญี่ปุ่น" data-style="J-Rock / Pop" 
+                 data-photo="https://cms.dmpcdn.com/musicarticle/2025/01/14/e5577330-d28d-11ef-af62-bbb29a1bba7c_webp_original.webp" 
+                 data-bio="<strong>ชื่อจริง:</strong> (ไม่เปิดเผยตัวตน)<br><strong>เกิด:</strong> 24 ตุลาคม ค.ศ. 2002<br><strong>บ้านเกิด:</strong> โตเกียว, ญี่ปุ่น<br><strong>ค่ายปัจจุบัน:</strong> Universal Music Japan (Virgin Music)<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เริ่มต้นจากการร้องเพลงคัฟเวอร์ลง Niconico ตั้งแต่อายุ 14</li><li>เดบิวต์อย่างเป็นทางการในปี 2020</li><li>เพลงเปิดตัว “Usseewa” กลายเป็นไวรัลทั่วญี่ปุ่น</li><li>ผู้ร้องเพลงประกอบ One Piece Film: Red (ในนาม Uta)</li></ul><strong>เพลงฮิต</strong><ul><li>Usseewa</li><li>New Genesis</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Usseewa","url":"https://youtu.be/Qp3b-RXtz4w"},{"title":"New Genesis","url":"https://www.youtube.com/watch?v=1FliVTcX8bQ"}],"apple":[{"title":"ADO","url":"https://music.apple.com/th/artist/ado/1492604670?l=th"}]}'>
+                 <img src="https://cms.dmpcdn.com/musicarticle/2025/01/14/e5577330-d28d-11ef-af62-bbb29a1bba7c_webp_original.webp" class="artist-avatar" alt="">
+                 <div><div class="artist-name">ADO (อาโดะ)</div><div class="artist-info-sm">Japan • J-Pop</div></div>
+             </button>
+
+             <button class="artist-btn" data-group="japan" data-name="Yorushika (ヨルシカ)" data-country="ญี่ปุ่น" data-style="Literary Rock" 
+                 data-photo="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNE5v_ILzP0uVN_RdHXaxvzOglE7uwc7n4dQ&s" 
+                 data-bio="<strong>สมาชิก:</strong> n-buna (กีตาร์/แต่งเพลง), suis (ร้องนำ)<br><strong>แนวเพลง:</strong> Literary Rock<br><strong>ค่ายปัจจุบัน:</strong> Universal Music Japan<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>ก่อตั้งโดย n-buna อดีตโปรดิวเซอร์ Vocaloid ที่ต้องการสร้างเพลงด้วยเสียงร้องมนุษย์</li><li>คอนเซปต์ 'ไม่เปิดเผยใบหน้า' เพื่อให้ผู้ฟังซึมซับที่ผลงานเพลงเพียงอย่างเดียว</li><li>โดดเด่นด้วยเนื้อหาเชิงวรรณกรรมและการเล่าเรื่องที่ลึกซึ้ง</li></ul><strong>เพลงฮิต</strong><ul><li>Tada Kimi ni Hare</li><li>Itte.</li><li>Hana ni Bourei</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Sunny (晴る)","url":"https://www.youtube.com/watch?v=CkvWJNt77mU&list=RDCkvWJNt77mU&start_radio=1"},{"title":"Itte. (言って。)","url":"https://www.youtube.com/watch?v=F64yFFnZfkI&list=RDF64yFFnZfkI&start_radio=1"}],"apple":[{"title":"Yorushika","url":"https://music.apple.com/th/artist/yorushika/1250709916"}]}'>
+                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNE5v_ILzP0uVN_RdHXaxvzOglE7uwc7n4dQ&s" class="artist-avatar" alt="">
+                 <div><div class="artist-name">Yorushika (ヨルシカ)</div><div class="artist-info-sm">Japan • Literary Rock</div></div>
+             </button>
+
+             <button class="artist-btn" data-group="japan" data-name="『ユイカ』 (Yuika)" data-country="ญี่ปุ่น" data-style="Acoustic Pop" 
+                 data-photo="https://yt3.googleusercontent.com/yqmPpyLzXbfWupBWrmdgX28czQ-VJ5i6XGW69FdgRMQjy2w_BQg3b0AbbVSxWGETilqnssodRg=s900-c-k-c0x00ffffff-no-rj" 
+                 data-bio="<strong>วันเกิด:</strong> 12 มกราคม<br><strong>แนวเพลง:</strong> Acoustic Pop<br><strong>ค่ายปัจจุบัน:</strong> Universal Music Japan<br><br><strong>เส้นทางในวงการเพลง</strong><ul><li>เริ่มต้นในฐานะ 'นักร้องนักแต่งเพลงหญิงวัยมัธยมปลาย'</li><li>สร้างชื่อเสียงจากการเล่นกีตาร์โปร่งร้องเพลงลง TikTok และ Instagram</li><li>เนื้อเพลงถ่ายทอดความรักวัยรุ่นได้อย่างสมจริงและตรงไปตรงมา</li></ul><strong>เพลงฮิต</strong><ul><li>Suki dakara</li><li>Koi Dorobou</li></ul>" 
+                 data-extra='{"youtube":[{"title":"Suki dakara","url":"https://www.youtube.com/watch?v=eYAd4uDotF0&list=RDeYAd4uDotF0&start_radio=1"},{"title":"It does not have to be Christmas Day","url":"https://www.youtube.com/watch?v=W6nUi-45LiA"}],"apple":[{"title":"Yuika","url":"https://music.apple.com/th/artist/yuika/1511874806"}]}'>
+                 <img src="https://yt3.googleusercontent.com/yqmPpyLzXbfWupBWrmdgX28czQ-VJ5i6XGW69FdgRMQjy2w_BQg3b0AbbVSxWGETilqnssodRg=s900-c-k-c0x00ffffff-no-rj" class="artist-avatar" alt="">
+                 <div><div class="artist-name">『ユイカ』 (Yuika)</div><div class="artist-info-sm">Japan • Acoustic Pop</div></div>
+             </button>
+             
+          </div>
+
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="glass-panel p-4 h-100 position-relative">
+          <div class="detail-photo-container">
+              <div class="detail-photo-inner">
+                  <img id="dPhoto" src="" class="detail-photo" alt="Artist Photo">
+                  <div class="detail-photo-overlay">
+                    <h2 id="dName" class="mb-2 display-6 fw-bold text-dark" style="font-family: 'Bai Jamjuree', sans-serif;">Artist Name</h2>
+                    <div class="d-flex gap-2 justify-content-center">
+                      <span id="dCountry" class="badge-custom">Country</span>
+                      <span id="dStyle" class="badge-custom text-white bg-secondary border-0">Style</span>
+                    </div>
+                  </div>
+              </div>
+          </div>
+          <div class="row g-4">
+            <div class="col-md-7">
+              <h5 class="fw-bold mb-3 text-dark d-flex align-items-center"><i class="bi bi-brush me-2 text-primary"></i>ประวัติย่อ</h5>
+              <div id="dBio" class="detail-bio-box bio-anim mb-4"></div>
+               <div class="p-3 rounded-3" style="background: #fff; border: 1px solid #efeaf8;">
+                <small class="text-uppercase fw-bold text-muted d-block mb-3" style="font-size: 0.75rem; letter-spacing: 1px;"><i class="bi bi-music-note-beamed me-1"></i> Listen on Apple Music</small>
+                <div id="dApple" class="d-flex flex-column gap-3"></div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <h5 class="fw-bold mb-3 text-dark d-flex align-items-center"><i class="bi bi-play-circle-fill me-2 text-danger"></i>วิดีโอแนะนำ</h5>
+              <div id="dYoutube" class="d-flex flex-column gap-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ai-guru" class="py-5 reveal">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title mb-0" data-text="AI Guru">✨ AI Guru</h2>
+      <p class="text-muted mt-2 fs-5">ให้ "น้องเหมียว MeowGuru" ช่วยแนะนำเพลงตามอารมณ์ของคุณ 🐾</p>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="ai-guru-container">
+          <img id="meowGuruImg" src="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItZmt4eTBBcG1pbGYxRHFUbXE2blJQZFNSOmZpbGVfMDAwMDAwMDBlNjZjNzIyZmFlMzk5YzdkYjg2MWQyNjQiLCJ0cyI6IjIwNDE2IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiI3MmRkZWNmMDRlZTliZTM0MjMxYjA0MWFmZjJiMDc0YzhiYzg3NjRiY2FkM2UzMTEyYmMxZTNhNTUwNjMxYzliIiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==" data-light="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItZmt4eTBBcG1pbGYxRHFUbXE2blJQZFNSOmZpbGVfMDAwMDAwMDBlNjZjNzIyZmFlMzk5YzdkYjg2MWQyNjQiLCJ0cyI6IjIwNDE2IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiI3MmRkZWNmMDRlZTliZTM0MjMxYjA0MWFmZjJiMDc0YzhiYzg3NjRiY2FkM2UzMTEyYmMxZTNhNTUwNjMxYzliIiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==" data-dark="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItZmt4eTBBcG1pbGYxRHFUbXE2blJQZFNSOmZpbGVfMDAwMDAwMDA2ZDE0NzIyZjhmMjIyMjUxNDA3ZjZhYWYiLCJ0cyI6IjIwNDE2IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiI4MzVlNTc1ZmZhZWU0MjU2OWM1MmM5ZjJlMTRlNjMzMWVkNDkxMzVlZTZlYmE0Y2JhYmFkZTViOTI1ZWE1NjNiIiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==" alt="AI Cat Guru" class="ai-cat-avatar">
+          
+          <div id="ai-response" class="ai-chat-box mt-4">
+            <p class="text-center text-muted my-5">
+              <i class="bi bi-stars fs-1 d-block mb-3 text-warning"></i>
+              ทาสจ๋า... วันนี้รู้สึกยังไงบ้าง? 😺<br>
+              บอกเค้าหน่อยสิ เดี๋ยวเค้าเลือกเพลงเพราะๆ และคอนเสิร์ตดีๆ ให้ฟังนะเมี๊ยว! 🎶
+            </p>
+          </div>
+          <div class="ai-input-group mt-4">
+            <input type="text" id="ai-user-input" placeholder="เช่น 'เศร้ามากโดนเท', 'ดีใจสอบผ่านแล้ว'..." class="shadow-sm">
+            <button id="btn-ask-ai" class="btn-ai-send shadow-sm ms-2">
+              <i class="bi bi-send-fill fs-5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 reveal">
+  <div class="container">
+    <div class="glass-panel p-5" style="border-left: 8px solid var(--secondary); background: #fff;">
+      <h2 class="fw-bold mb-5 section-title" style="font-size:2.2rem;">
+        <i class="bi bi-chat-square-heart-fill text-danger me-2"></i>ArtistHub Gossip
+      </h2>
+      <div class="row gy-4" id="summary-container">
+        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-4 shadow-sm" style="background:#fdf0f6; border:1px solid #fce4ec;"><h6 class="fw-bold mb-3 text-dark" id="sum-col1-title"></h6><div class="text-muted small" id="sum-col1-content"></div></div></div>
+        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-4 shadow-sm" style="background:#f3e5f5; border:1px solid #f3e5f5;"><h6 class="fw-bold mb-3 text-dark" id="sum-col2-title"></h6><div class="text-muted small" id="sum-col2-content"></div></div></div>
+        <div class="col-12 col-md-4"><div class="p-4 h-100 rounded-4 shadow-sm" style="background:#e0f7fa; border:1px solid #e0f7fa;"><h6 class="fw-bold mb-3 text-dark" id="sum-col3-title"></h6><div class="text-muted small" id="sum-col3-content"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 reveal">
+  <div class="container">
+    <div class="glass-panel p-5">
+       <div class="text-center mb-4">
+           <h2 class="fw-bold mb-2 section-title" style="font-size:2.2rem;" data-text="Fan Zone">Fan Zone</h2>
+           <p class="text-muted fs-5">โซนเม้าท์มอย!</p>
+       </div>
+       <div class="chat-board-container mb-4">
+          <div class="post-it-grid d-flex flex-wrap justify-content-center gap-3" id="chat-messages">
+             <div class="text-center text-muted py-5 w-100">
+                <div class="spinner-border text-secondary mb-2" role="status"></div>
+                <p>กำลังโหลดข้อความจาก Sheets...</p>
+             </div>
+          </div>
+       </div>
+       <form id="chat-form" class="d-flex gap-2 mt-4 justify-content-center">
+         <input type="text" id="chat-name" class="form-control shadow-sm rounded-pill px-3" placeholder="ชื่อของคุณ" style="max-width: 150px; border:2px solid #eee;" required>
+         <input type="text" id="chat-input" class="form-control shadow-sm rounded-pill px-3" placeholder="แปะข้อความทิ้งไว้..." style="max-width: 400px; border:2px solid #eee;" required>
+         <button type="submit" class="btn btn-dark shadow rounded-circle" style="width:45px; height:45px; padding:0; display:flex; align-items:center; justify-content:center;"><i class="bi bi-send-fill"></i></button>
+       </form>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 reveal">
+  <div class="container">
+    <div class="radio-panel">
+      <div class="row g-0">
+        <div class="col-lg-5 p-5 d-flex flex-column justify-content-between position-relative text-center text-lg-start">
+           <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at top left, #6c5ce7 0%, transparent 60%); opacity:0.3; z-index:0;"></div>
+           <div style="z-index:1;">
+             <div class="d-flex align-items-center justify-content-center justify-content-lg-start mb-4">
+               <i class="bi bi-broadcast fs-3 me-2 text-danger animate__animated animate__flash animate__infinite animate__slow"></i>
+               <h2 class="fw-bold m-0 text-white" style="font-family:'Bai Jamjuree'; font-size:1.8rem; text-shadow: 0 0 10px rgba(0,0,0,0.5);">Global Radio</h2>
+             </div>
+             <div class="mb-4 text-center position-relative">
+               <div id="globe-container" class="globe-container"></div>
+               
+               <div class="mt-4">
+                   <h4 id="radio-station-name" class="fw-bold mb-1 text-white" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Select a Station</h4>
+                   <p id="radio-country" class="text-white-50 small">Click the globe to explore</p>
+               </div>
+             </div>
+             
+             <div class="d-flex justify-content-center align-items-center gap-4 mb-3">
+               <button id="btn-radio-prev" class="btn btn-outline-light rounded-circle border-0 p-2"><i class="bi bi-skip-backward-fill fs-4"></i></button>
+               <button id="btn-radio-play" class="btn btn-light rounded-circle shadow-lg d-flex align-items-center justify-content-center hover-scale" style="width:65px; height:65px; color:#6c5ce7;">
+                 <i class="bi bi-play-fill fs-1 ms-1"></i>
+               </button>
+               <button id="btn-radio-next" class="btn btn-outline-light rounded-circle border-0 p-2"><i class="bi bi-skip-forward-fill fs-4"></i></button>
+             </div>
+             <div class="px-4 w-75 mx-auto">
+               <input type="range" class="form-range" id="radio-volume" min="0" max="1" step="0.1" value="0.8">
+             </div>
+           </div>
+        </div>
+        
+        <div class="col-lg-7 bg-dark text-white p-4" style="background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);">
+           <h5 class="fw-bold mb-4 px-2 text-white-50 border-bottom border-secondary pb-2"><i class="bi bi-globe-americas me-2"></i>Music Stations</h5>
+           
+           <div class="d-flex gap-2 px-2 mb-3 overflow-auto pb-2" id="radio-filters">
+               <button class="btn btn-sm btn-outline-light rounded-pill active px-3" data-filter="all">All</button>
+           </div>
+           
+           <div class="list-group list-group-flush custom-scroll pe-2" id="station-list" style="max-height: 600px; overflow-y: auto;">
+               </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="submit" class="py-5 reveal">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="glass-panel p-5 text-center">
+          <i class="bi bi-send-fill display-3 mb-3 text-primary"></i>
+          <h2 class="fw-bold mb-3 text-dark">ร่วมเป็นส่วนหนึ่งของคอมมูนิตี้</h2>
+          <p class="text-muted mb-4 px-md-5">ส่งฟอร์มเพื่อเพิ่มศิลปินที่ควรแนะนำบนเว็บนี้</p>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSdIBw1Q5YeZpzPkwbsaqFJs6ZW2xYZEd4dKYPrIJtsSLflENA/viewform" target="_blank" class="btn btn-contact px-5 py-3 text-white shadow">ไปที่แบบฟอร์ม <i class="bi bi-arrow-right ms-2"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="members" class="py-5 reveal">
+  <div class="container">
+    <div class="glass-panel p-5 text-center">
+      <h2 class="fw-bold mb-5 section-title" data-text="คณะผู้จัดทำ">คณะผู้จัดทำ</h2>
+      <div class="row g-4 justify-content-center">
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <img src="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItZmt4eTBBcG1pbGYxRHFUbXE2blJQZFNSOmZpbGVfMDAwMDAwMDA1NzY0NzIyZjlkZDQ0MGM4ZGU1ZWYzYTMiLCJ0cyI6IjIwNDE1IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiJjMjMzOTZmZjdiZWJhOTFmNTNlNmVkN2RiYzY0MTU0MTJhZjViMWMyNzc5NjhiYTE1NjJiYWQ0NjUxZWI0NmQxIiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==" 
+                     alt="ศุภวิชญ์ แซ่อิ๋ว" 
+                     style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 7px solid #fff; box-shadow: 0 12px 25px rgba(161, 140, 209, 0.3);">
+                <h6 class="fw-bold text-dark mt-3">ศุภวิชญ์ แซ่อิ๋ว</h6>
+                <p class="text-muted small mb-0">68046786</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <img src="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItZmt4eTBBcG1pbGYxRHFUbXE2blJQZFNSOmZpbGVfMDAwMDAwMDBmNzdjNzIyZjlhZjFiYTk3ZjY5NDA0NjciLCJ0cyI6IjIwNDE1IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiJjZjExMjM1NGM3YWQyMzE0OThhZGIzZDNhMWM1NTgwYWMyNTU4ZTAzMGI1NDBhMDRiNDc2YTdmYzdjZDFlMzA2IiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==" 
+                     alt="ศตรายุ กรึงชัง" 
+                     style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 7px solid #fff; box-shadow: 0 12px 25px rgba(161, 140, 209, 0.3);">
+                <h6 class="fw-bold text-dark mt-3">ศตรายุ กรึงชัง</h6>
+                <p class="text-muted small mb-0">68060424</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <img src="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItZmt4eTBBcG1pbGYxRHFUbXE2blJQZFNSOmZpbGVfMDAwMDAwMDBlYTdjNzIyZjgwY2QyYmI3YmU5MjM3YjYiLCJ0cyI6IjIwNDE5IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiJjZDM2NWQ2NjhjNmYzOGQ5YTM2Y2RmMDk3OTUwNDk1NGViYWZmNmQ1YmFlMTQ3NzJhMmU2ZmU4MDc2NjA1NzI2IiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==" 
+                     alt="พชรดนัย เพียรทำดี" 
+                     style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 7px solid #fff; box-shadow: 0 12px 25px rgba(161, 140, 209, 0.3);">
+                <h6 class="fw-bold text-dark mt-3">พชรดนัย เพียรทำดี</h6>
+                <p class="text-muted small mb-0">68060455</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <img src="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItZmt4eTBBcG1pbGYxRHFUbXE2blJQZFNSOmZpbGVfMDAwMDAwMDAwMWQ0NzFmNTkwZWRhNjc4NmE2NjVkZGYiLCJ0cyI6IjIwNDE1IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiIzZmIwYzRjMWUwYzEwMmYzMTYxNjk5NzMzMjRlZmMyNTlmYjVhMmY0NzI3ZjAxODE1MTA5MDdkNjI1MDcwMjdkIiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ=="
+                     alt="ราเวิน ไดลัน อาร์เนสัน"
+                     style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 7px solid #fff; box-shadow: 0 12px 25px rgba(161, 140, 209, 0.3);">
+                <h6 class="fw-bold text-dark mt-3">ราเวิน ไดลัน อาร์เนสัน</h6>
+                <p class="text-muted small mb-0">68067967</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <img src="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItZmt4eTBBcG1pbGYxRHFUbXE2blJQZFNSOmZpbGVfMDAwMDAwMDBkZmU4NzIyZjk0ZWNlNDk2MWE4NDY2OGMiLCJ0cyI6IjIwNDIwIiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiIyNTEwY2UyNDlkZmM2YjAxMGFkMzNiMDlkZjM0M2Y5NTlkZDFkNTkwMzE4ZmQ5ZDU0Y2FmY2JhNGQzOGZhZDk0IiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==" 
+                     alt="ศุภาพิชญ์ บุหรั่นฉาย" 
+                     style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 7px solid #fff; box-shadow: 0 12px 25px rgba(161, 140, 209, 0.3);">
+                <h6 class="fw-bold text-dark mt-3">ศุภาพิชญ์ บุหรั่นฉาย</h6>
+                <p class="text-muted small mb-0">68062664</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-4">
+            <div class="member-card h-100">
+                <img src="https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6InVzZXItd00xZmtKOHF0cXp5NlBIWE9UektySmtSOmZpbGVfMDAwMDAwMDBkYTA0NzIyZjhmNjg3YjE5NTZjMWQwYzkiLCJ0cyI6IjIwNDE1IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiI2OTljN2NiZWQwYjdmNDJlZjc3NDAwNjMyOTc1ZWEzOTQxMmZmNmVjMjkxYjQ2NTNmMzljYmYwZWE3NTU5YWNiIiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==" 
+                     alt="ภาคิน พงศ์มั่นจิน" 
+                     style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 7px solid #fff; box-shadow: 0 12px 25px rgba(161, 140, 209, 0.3);">
+                <h6 class="fw-bold text-dark mt-3">ภาคิน พงศ์มั่นจิน</h6>
+                <p class="text-muted small mb-0">68050800</p>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer container my-5 p-4 p-md-5 reveal active">
+  <div class="row gy-4">
+    <div class="col-lg-4 col-md-6">
+      <div class="footer-card h-100">
+        <div class="footer-brand mb-3">
+          <img src="https://github.com/Ikarasul/karasu.github.io/blob/main/img/Logo%20SPU%20SIT_Color.png?raw=true" height="40" alt="Logo">
+          <h5 class="brand m-0">ArtistHub</h5>
+        </div>
+        <p class="muted small pe-lg-2">
+          พื้นที่รวบรวมแรงบันดาลใจทางศิลปะและเสียงเพลง เชื่อมโยงศิลปินที่คุณรักและชุมชนแฟนคลับเข้าด้วยกัน
+        </p>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="footer-card h-100">
+        <div class="footer-title"><span class="dot"></span><span>🗺️ แผนที่เว็บไซต์</span></div>
+        <ul class="footer-links small">
+          <li><a href="#home"><i class="bi bi-chevron-right me-1"></i> หน้าหลัก</a></li>
+          <li><a href="#artists"><i class="bi bi-chevron-right me-1"></i> ศิลปินแนะนำ</a></li>
+          <li><a href="#ai-guru"><i class="bi bi-chevron-right me-1"></i> AI Guru</a></li>
+          <li><a href="#submit"><i class="bi bi-chevron-right me-1"></i> เสนอรายชื่อ</a></li>
+          <li><a href="#members"><i class="bi bi-chevron-right me-1"></i> คณะผู้จัดทำ</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+      <div class="footer-card h-100">
+        <div class="footer-title"><span class="dot"></span><span>🎓 โครงการการศึกษา</span></div>
+        <ul class="footer-links small">
+          <li class="d-flex align-items-start">
+            <i class="bi bi-buildings-fill me-2 text-secondary"></i>
+            <div>
+              <strong class="ink">คณะเทคโนโลยีสารสนเทศ</strong><br>
+              <span class="muted">มหาวิทยาลัยศรีปทุม (SPU)</span>
+            </div>
+          </li>
+          <li class="d-flex align-items-start mt-2">
+            <i class="bi bi-journal-code me-2 text-secondary"></i>
+            <div>
+              <strong class="ink">วิชา: ICT12267</strong><br>
+              <span class="muted">การพัฒนาเว็บแอปพลิเคชันส่วนติดต่อกับผู้ใช้</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <hr class="footer-divider">
+
+  <div class="footer-meta">
+    <div>© 2025 <span class="ink fw-semibold">ArtistHub Project</span>. All rights reserved.</div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge-chip">Version 3.0.0</span>
+      <span class="muted">Designed with passion by SPU Students.</span>
+    </div>
+  </div>
+</footer>
+
+<button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+  <i class="bi bi-moon-fill" id="themeIcon"></i>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

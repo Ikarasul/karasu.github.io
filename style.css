@@ -1,0 +1,661 @@
+/* =========================================
+   1. VARIABLES & RESET
+   ========================================= */
+:root {
+  /* ☀️ Light Mode: Modern Blue & Violet */
+  --primary: #3b82f6;      
+  --secondary: #8b5cf6;    
+  --accent: #10b981;       
+  --text-main: #1f2937;    
+  --text-muted: #6b7280;   
+  --bg-body: #f3f4f6;      
+  
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+  --glass-highlight: 1px solid rgba(255, 255, 255, 0.9);
+  
+  /* Shadows */
+  --shadow-soft: 0 10px 30px -5px rgba(59, 130, 246, 0.15);
+  --shadow-hover: 0 20px 40px -5px rgba(59, 130, 246, 0.25);
+  --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+
+  /* Shapes */
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-pill: 999px;
+  --shadow-1: 0 10px 30px -8px rgba(0,0,0,.08);
+  --shadow-2: 0 18px 50px -10px rgba(0,0,0,.12);
+  --outline-soft: 1px solid rgba(255,255,255,0.6);
+  --outline-ghost: 1px solid rgba(0,0,0,0.05);
+}
+
+body {
+  font-family: 'Bai Jamjuree', sans-serif;
+  background-color: var(--bg-body); 
+  color: var(--text-main); 
+  line-height: 1.8; 
+  overflow-x: hidden;
+  
+  /* ☀️ Light Mode Background */
+  background:
+    radial-gradient(at 18% 23%, #dbeafe 0px, transparent 50%),
+    radial-gradient(at 85% 15%, #ede9fe 0px, transparent 50%),
+    radial-gradient(at 54% 47%, #e0e7ff 0px, transparent 50%),
+    radial-gradient(at 22% 83%, #d1fae5 0px, transparent 50%),
+    radial-gradient(at 74% 78%, #f3f4f6 0px, transparent 50%),
+    linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  background-attachment: fixed; 
+  background-size: 200% 200%; 
+  animation: gradientMove 15s ease infinite;
+}
+
+@keyframes gradientMove { 
+  0% { background-position: 0% 50%; } 
+  50% { background-position: 100% 50%; } 
+  100% { background-position: 0% 50%; } 
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand, .section-title, .artist-name, .post-it { 
+  font-family: 'Mali', cursive; 
+  font-weight: 700; 
+}
+
+#canvas-bg { 
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 1; 
+}
+
+/* Global Scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.5); backdrop-filter: blur(4px); }
+::-webkit-scrollbar-thumb { background: var(--gradient-primary); border-radius: 10px; border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--secondary); }
+
+/* =========================================
+   2. COMPONENTS & UTILITIES
+   ========================================= */
+.glass-panel { 
+  background: var(--glass-bg); 
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+  border: var(--outline-soft) !important;
+  border-top: var(--glass-highlight); 
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-1) !important;
+  transition: all 0.4s; position: relative; overflow: hidden; 
+}
+.glass-panel:hover { 
+  transform: translateY(-2px); 
+  box-shadow: var(--shadow-2) !important;
+}
+
+.section-title {
+  position: relative; display: inline-block; padding-bottom: .35rem;
+}
+.section-title::after {
+  content: ""; position: absolute; left: .15rem; right: .15rem; bottom: -.45rem;
+  height: 8px; border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent)); opacity: .35;
+}
+
+.reveal { opacity: 0; transform: translateY(50px); transition: all 1s; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+.hidden { display: none !important; }
+
+.btn, .filter-chip, .badge-custom, .nav-link, .btn-contact { border-radius: var(--radius-pill) !important; }
+input.form-control, #chat-name, #chat-input {
+  border-radius: var(--radius-pill) !important;
+  padding-top: .85rem; padding-bottom: .85rem;
+}
+
+/* =========================================
+   3. NAVBAR
+   ========================================= */
+.navbar { 
+  background: rgba(255, 255, 255, 0.8) !important; 
+  backdrop-filter: blur(24px); 
+  border-bottom: 1px solid rgba(255,255,255,0.5); 
+  padding: 1rem 0; transition: all 0.4s ease; 
+}
+.navbar-brand img { height: 48px; transition: 0.5s; }
+.navbar-brand:hover img { transform: scale(1.1) rotate(5deg); }
+.brand-text { 
+  background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; 
+}
+.nav-link { 
+  color: var(--text-muted) !important; font-weight: 700; 
+  padding: 0.6rem 1rem !important; margin: 0 4px; transition: all 0.3s ease; 
+  border: 1px solid rgba(0,0,0,0.03);
+}
+.nav-tab { padding: 8px 16px; border-radius: 14px; font-weight: 600; transition: .25s; }
+.nav-tab:hover { background: #ffe5f1; color: #ff3d87 !important; }
+.nav-link.active { 
+  background: #ffd7ec; color: #d41974 !important; 
+  box-shadow: 0 8px 18px rgba(161,140,209,0.25); 
+}
+.btn-contact { 
+  background: var(--text-main); color: #fff !important; 
+  border: none; padding: 0.7rem 2rem !important; transition: 0.4s; 
+  font-family: 'Bai Jamjuree'; font-weight: 600; 
+}
+.btn-contact:hover { 
+  background: var(--secondary); transform: translateY(-3px) scale(1.05); 
+  box-shadow: 0 8px 20px rgba(161, 140, 209, 0.4); 
+}
+
+/* =========================================
+   4. HERO SECTION
+   ========================================= */
+.hero { padding-top: 160px; padding-bottom: 60px; }
+.hero-profile-container { 
+  position: relative; width: 100%; height: 100%; min-height: 520px;
+  border-radius: calc(var(--radius-xl) + 8px) !important; overflow: hidden;
+  border: 12px solid #fff;
+  box-shadow: 0 30px 70px rgba(161, 140, 209, 0.35);
+  transform: rotate(-2deg); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.hero-profile-container:hover { transform: rotate(0deg) scale(1.02); box-shadow: 0 40px 90px rgba(255, 154, 158, 0.45); }
+.hero-profile-container img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1); }
+.hero-info-card { 
+  position: absolute; bottom: 25px; left: 25px; right: 25px; 
+  background: rgba(255, 255, 255, 0.92); border-radius: 30px; 
+  padding: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
+  border: 1px solid #fff; backdrop-filter: blur(10px); 
+}
+
+/* Hero Highlight Text */
+.hero-highlight { color: var(--primary); transition: all 0.3s ease; }
+
+/* =========================================
+   5. ARTISTS SECTION
+   ========================================= */
+.artist-sidebar { 
+  padding: 2rem; height: 100%; display: flex; flex-direction: column; 
+  background: rgba(255,255,255,0.85); border-radius: var(--radius-xl) !important; 
+  border: 1px solid #fff; box-shadow: var(--shadow-soft); backdrop-filter: blur(15px); 
+}
+.filter-chip { 
+  border: 1px solid #eee; padding: 8px 18px; font-size: 0.9rem; 
+  background: #fff; transition: 0.3s; cursor: pointer; 
+  font-family: 'Mali'; font-weight: 700; color: var(--text-muted); 
+}
+.filter-chip:hover { background: #f1f2f6; }
+.filter-chip.active { 
+  background: linear-gradient(135deg, #FF9A9E, #A18CD1) !important; 
+  color: #fff !important; border: none; 
+  box-shadow: 0 8px 15px rgba(255, 154, 158, 0.4); transform: scale(1.05); 
+}
+
+/* Artist List Scroll */
+#artistList {
+  background: #fff4ec !important; border-radius: 14px;
+  padding: 10px 12px !important; box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  max-height: 520px !important; overflow-y: auto !important; padding-right: 6px;
+  color: #d46a1f !important;
+}
+#artistList::-webkit-scrollbar { width:6px; }
+#artistList::-webkit-scrollbar-thumb { background:rgba(150,150,150,.35); border-radius:4px; }
+
+.artist-group-header { 
+  font-weight: 800; font-size: 1rem; letter-spacing: 1px; 
+  margin: 1.5rem 0 0.8rem 0; padding: 6px 12px !important; 
+  border-left: 5px solid var(--secondary); background: #fff4ec !important; 
+  color: #d46a1f !important; border-radius: 10px !important;
+}
+.artist-btn { 
+  display: flex; align-items: center; gap: 1.2rem; width: 100%; border: none; 
+  padding: 12px 15px; margin-bottom: 12px; transition: all 0.3s; 
+  text-align: left; cursor: pointer; border-radius: var(--radius-lg) !important;
+  background: #fffdf8 !important; color: #d46a1f !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important; border: 1px solid rgba(0,0,0,0.04) !important;
+}
+.artist-btn:hover { 
+  background: #fff0f3 !important; transform: translateX(8px) translateY(-2px) !important; 
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08); 
+}
+.artist-btn.active { 
+  background: #fff !important; border: 2px solid var(--primary) !important; 
+  box-shadow: 0 8px 25px rgba(255, 154, 158, 0.2); 
+}
+.artist-avatar { 
+  width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: top center; 
+  border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.4s; 
+}
+.artist-btn:hover .artist-avatar { transform: rotate(15deg) scale(1.1); }
+.artist-name { font-weight: 700; color: #2d3436 !important; }
+.artist-info-sm { color: #636e72 !important; }
+
+/* Detail Area */
+.detail-photo-container { 
+  position: relative; border-radius: var(--radius-xl) !important; padding: 12px; 
+  background: #fff; box-shadow: var(--shadow-soft); margin-bottom: 2.5rem; 
+  transform: rotate(-1deg); transition: all 0.5s; 
+}
+.detail-photo-container:hover { transform: rotate(0deg) scale(1.01) translateY(-5px); z-index: 10; }
+.detail-photo-inner { 
+  border-radius: var(--radius-xl) !important; overflow: hidden; height: 480px; position: relative; 
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.1); display: flex; 
+  justify-content: center; align-items: center; background: #f8f9fa; 
+}
+.detail-photo { width: auto; height: 100%; max-width: 100%; object-fit: cover; }
+.detail-photo-overlay { 
+  position: absolute; bottom: 20px; left: 20px; right: 20px; 
+  background: rgba(255, 255, 255, 0.9); padding: 1.5rem; 
+  border-radius: var(--radius-lg) !important; backdrop-filter: blur(15px); text-align: center; 
+  border: 1px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+}
+
+/* Bio Box Scroll */
+.detail-bio-box { 
+  border-radius: 24px; padding: 2.5rem; margin-bottom: 2rem; 
+  border-left: 5px solid var(--primary); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+  max-height: 400px !important; overflow-y: auto !important; padding-right: 10px;
+  background: #fffdf8 !important; color: #333 !important;
+}
+.detail-bio-box::-webkit-scrollbar { width: 6px; }
+.detail-bio-box::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.4); border-radius: 4px; }
+#dBio, #dBio * { background: #fffdf8 !important; color: #333 !important; }
+
+.video-card { 
+  border-radius: var(--radius-xl) !important; overflow: hidden; background: #fff; 
+  position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+  transition: all 0.4s; border: 4px solid #fff; cursor: pointer; 
+}
+.video-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 35px rgba(161, 140, 209, 0.25); }
+.video-card img { width: 100%; height: 150px; object-fit: cover; }
+
+/* =========================================
+   6. AI GURU (KAWAII UPGRADE)
+   ========================================= */
+.ai-guru-container {
+  background: #ffffff !important;
+  border: double 4px transparent !important;
+  border-radius: 40px !important;
+  background-image: linear-gradient(white, white), linear-gradient(135deg, #FF9A9E, #A18CD1, #84FAB0) !important;
+  background-origin: border-box !important;
+  background-clip: padding-box, border-box !important;
+  box-shadow: 0 20px 50px rgba(161, 140, 209, 0.25) !important;
+  overflow: visible !important;
+  padding-top: 4rem !important; margin-top: 40px; position: relative;
+}
+.ai-cat-avatar { 
+  width: 140px !important; height: 140px !important; border-radius: 50%; object-fit: cover; 
+  border: 6px solid #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+  position: absolute; top: -70px !important; left: 50%; transform: translateX(-50%); z-index: 10; background: #fff; 
+  animation: floatCat 3s ease-in-out infinite;
+}
+@keyframes floatCat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+}
+.ai-chat-box { 
+  background: rgba(248, 249, 250, 0.7) !important;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+  border-radius: 25px !important;
+  box-shadow: inset 0 0 20px rgba(161, 140, 209, 0.05);
+  padding: 20px; min-height: 200px; max-height: 600px; overflow-y: auto; font-size: 1.05rem;
+}
+.ai-input-group { position: relative; display: flex; align-items: center; margin-top: 1.5rem; }
+.ai-input-group input {
+  background: #fff; border: 2px solid #eee; border-radius: 50px !important;
+  padding: 15px 60px 15px 25px !important; width: 100%; transition: all 0.3s;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+}
+.ai-input-group input:focus {
+  border-color: #A18CD1; box-shadow: 0 0 0 5px rgba(161, 140, 209, 0.15); transform: translateY(-2px);
+}
+#btn-ask-ai {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 48px; height: 48px; border-radius: 50% !important; border: none;
+  background: linear-gradient(135deg, #FF9A9E, #A18CD1); color: white;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 10px rgba(161, 140, 209, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#btn-ask-ai:hover { transform: translateY(-50%) scale(1.15) rotate(-10deg); box-shadow: 0 8px 20px rgba(161, 140, 209, 0.6); }
+#btn-ask-ai i { font-size: 1.2rem; margin-left: -2px; margin-top: 2px; }
+
+/* =========================================
+   7. GLOBAL RADIO: LIGHT & DARK MODE SUPPORT
+   ========================================= */
+
+/* ☀️ Light Mode Radio (ขาว-ฟ้า สว่างๆ) */
+.radio-panel {
+  background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 20px 60px rgba(161, 140, 209, 0.2) !important;
+  color: #1f2937 !important;
+  border-radius: var(--radius-xl) !important; overflow: hidden; position: relative;
+}
+/* แสงฟุ้ง Light Mode */
+.radio-panel::after {
+  content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+/* Light Mode - รายการสถานี */
+.radio-item {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  color: #4b5563 !important; /* สีเทาเข้ม */
+  border-radius: 20px !important; margin-bottom: 10px; transition: all 0.3s;
+}
+.radio-item:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #2563eb !important; /* สีฟ้าเข้มเมื่อชี้ */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.radio-item.active {
+  background: linear-gradient(90deg, #e0e7ff, #ede9fe) !important;
+  border: 1px solid #8b5cf6 !important;
+  color: #4338ca !important;
+  font-weight: bold;
+}
+.radio-item.active .badge { background: #8b5cf6 !important; color: #fff !important; }
+
+/* Light Mode - Globe & Controls */
+.globe-container {
+  background: #f8fafc !important; /* พื้นหลังลูกโลกสีอ่อน */
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.2), inset 0 0 60px rgba(255,255,255,0.8) !important;
+  border: 2px solid rgba(0,0,0,0.05);
+  width: 320px; height: 320px; margin: 0 auto; border-radius: 50%;
+  cursor: grab; position: relative; transition: transform 0.5s;
+}
+.globe-container:hover { transform: scale(1.02); }
+#btn-radio-play {
+  background: white !important; color: #3b82f6 !important;
+  border: 4px solid #dbeafe !important; box-shadow: 0 5px 20px rgba(59, 130, 246, 0.2);
+}
+#btn-radio-prev, #btn-radio-next { border-color: #d1d5db !important; color: #6b7280 !important; }
+#btn-radio-prev:hover, #btn-radio-next:hover { background: #f3f4f6 !important; color: #3b82f6 !important; }
+
+/* หัวข้อ Light Mode */
+#radio-station-name { color: #1f2937 !important; text-shadow: none !important; }
+#radio-country { color: #6b7280 !important; }
+.radio-panel h2 { color: #1f2937 !important; text-shadow: none !important; }
+.radio-panel .bg-dark { background: transparent !important; color: #1f2937 !important; } /* แก้ฝั่งขวา */
+.radio-panel .text-white-50 { color: #6b7280 !important; }
+.radio-panel .border-secondary { border-color: #e5e7eb !important; }
+
+/* Scroll Light Mode */
+#station-list { max-height: 450px !important; overflow-y: auto !important; padding-right: 5px; }
+#station-list::-webkit-scrollbar-thumb { background: #cbd5e1; }
+
+
+/* =========================================
+   8. CHAT, GOSSIP & MEMBERS
+   ========================================= */
+.chat-board-container { 
+  background: #f3e8d7 !important; border-radius: var(--radius-xl) !important; padding: 3rem; 
+  min-height: 480px; overflow-y: auto; 
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.05); border: 2px dashed rgba(161, 140, 209, 0.3); 
+}
+.post-it { 
+  width: 240px; min-height: 180px; padding: 1.8rem; background: #fff; color: #555; position: relative; 
+  box-shadow: 0 14px 28px rgba(0,0,0,0.12) !important; transition: all 0.4s; 
+  border-radius: 18px 18px 28px 18px !important; animation: floatIn 0.6s ease-out backwards; 
+}
+.post-it:hover { transform: scale(1.1) rotate(0deg) !important; z-index: 100; box-shadow: 20px 30px 50px rgba(161, 140, 209, 0.2); }
+.post-it div, .post-it span, .post-it p, .post-it li { color: #000 !important; }
+
+.gossip-card, .gossip-card * { color: #d46a1f !important; }
+.gossip-card { 
+    background: #fff4ec !important; border-radius: 12px !important; 
+    padding: 12px !important; box-shadow: 0 3px 8px rgba(0,0,0,0.08); 
+}
+
+.member-card { 
+  background: rgba(255, 255, 255, 0.85); border: 2px solid #fff; border-radius: var(--radius-xl) !important; 
+  padding: 3rem 2rem; text-align: center; transition: 0.4s; 
+  box-shadow: var(--shadow-soft); backdrop-filter: blur(10px); position: relative; overflow: hidden; 
+}
+.member-card:hover { transform: translateY(-15px); box-shadow: var(--shadow-hover); border-color: var(--secondary); }
+.member-card img { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.member-card:hover img { transform: scale(1.1) rotate(3deg); border-color: #fff; }
+
+/* =========================================
+   9. FOOTER
+   ========================================= */
+footer.site-footer {
+  --ft-bg: var(--glass-bg, rgba(255,255,255,.75));
+  --ft-ink: var(--text-main, #2d3436);
+  --ft-muted: var(--text-muted, #636e72);
+  --ft-card: rgba(255,255,255,.9);
+  --ft-border: rgba(255,255,255,.7);
+  --ft-shadow: 0 20px 60px rgba(0,0,0,.08);
+  position: relative; border: 0 !important; background: var(--ft-bg);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border-radius: 28px; box-shadow: var(--ft-shadow); overflow: hidden;
+}
+footer.site-footer .ink { color: var(--ft-ink); }
+footer.site-footer .muted { color: var(--ft-muted); }
+footer.site-footer::before {
+  content:""; position:absolute; inset:-1px;
+  background: radial-gradient(1200px 220px at 10% -20%, rgba(255,154,158,.18), transparent 50%),
+              radial-gradient(900px 200px at 110% 10%, rgba(161,140,209,.18), transparent 60%),
+              radial-gradient(800px 180px at 50% 120%, rgba(132,250,176,.16), transparent 60%);
+  pointer-events:none;
+}
+.footer-card {
+  background: var(--ft-card); border: 1px solid var(--ft-border); border-radius: 22px;
+  padding: 18px 18px; height: 100%; box-shadow: 0 6px 18px rgba(161,140,209,.10);
+}
+.footer-title { font-family:'Mali', cursive; font-weight:800; display:flex; align-items:center; gap:.5rem; margin-bottom: .75rem; }
+.footer-title .dot { width:10px; height:10px; border-radius:999px; background: linear-gradient(135deg, var(--primary), var(--secondary)); box-shadow: 0 0 0 4px rgba(161,140,209,.15); }
+.footer-brand .brand { font-family:'Mali', cursive; font-weight:800; letter-spacing:.3px; background: var(--gradient-primary); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.footer-links { list-style:none; padding:0; margin:0; }
+.footer-links li { margin:.35rem 0; }
+.footer-links a { text-decoration:none; color: var(--ft-muted); border-bottom:1px dashed transparent; padding-bottom: 2px; transition:.2s ease; }
+.footer-links a:hover { color: var(--primary); border-color: var(--primary); transform: translateX(2px); }
+.footer-meta { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; justify-content:space-between; color: var(--ft-muted); font-size:.9rem; }
+.badge-chip { background: linear-gradient(135deg, rgba(255,154,158,.14), rgba(161,140,209,.14)); border: 1px solid rgba(255,255,255,.65); border-radius: 999px; padding: .4rem .8rem; font-weight:700; }
+.footer-divider { height:2px; border:0; margin: 1rem 0 1.2rem 0; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent)); opacity:.85; border-radius: 2px; }
+footer, footer p, footer li, footer small, footer .text-muted, footer a, footer h5, footer div, footer span { color: #111 !important; }
+footer a:hover { color: var(--primary) !important; }
+footer hr { opacity: 1; }
+
+/* Toggle */
+.theme-toggle {
+  position: fixed; right: 18px; bottom: 18px; z-index: 9999;
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--gradient-primary); color: #fff; border: none;
+  box-shadow: 0 10px 25px rgba(0,0,0,.25); cursor: pointer;
+}
+.theme-toggle:active { transform: scale(0.96); }
+
+/* =========================================
+   10. DARK MODE (THEME OVERRIDES - NEW COLORS)
+   ========================================= */
+body.dark {
+  /* 🌙 Dark Mode Variables */
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --bg-body: #0f172a;      
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --glass-highlight: 1px solid rgba(255, 255, 255, 0.1);
+  --shadow-soft: 0 10px 30px -5px rgba(0,0,0,0.5);
+  --shadow-hover: 0 20px 40px -5px rgba(0,0,0,0.7);
+  --gradient-primary: linear-gradient(135deg, #60a5fa, #c084fc); 
+  
+  /* 🌙 Dark Mode Background */
+  background:
+    radial-gradient(at 18% 23%, rgba(30, 58, 138, 0.4) 0px, transparent 50%), 
+    radial-gradient(at 85% 15%, rgba(88, 28, 135, 0.4) 0px, transparent 50%), 
+    radial-gradient(at 54% 47%, rgba(15, 23, 42, 0.5) 0px, transparent 50%),
+    radial-gradient(at 22% 83%, rgba(6, 78, 59, 0.4) 0px, transparent 50%), 
+    radial-gradient(at 74% 78%, rgba(15, 23, 42, 0.5) 0px, transparent 50%),
+    linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  color: var(--text-main); animation: gradientMove 15s ease infinite;
+}
+
+/* Dark Components */
+body.dark .navbar { background: rgba(15,17,22,0.85) !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
+body.dark .navbar-brand { filter: drop-shadow(0 0 6px rgba(255,180,220,0.55)); color: #ffffff !important; text-shadow: 0 0 8px rgba(255,255,255,0.4); }
+body.dark .brand-text { -webkit-text-fill-color: initial; }
+body.dark .nav-link { color: var(--text-muted) !important; }
+body.dark .nav-link.active { background: #334155; color: #60a5fa !important; box-shadow: 0 4px 14px rgba(96, 165, 250, 0.25); }
+body.dark .nav-tab:hover { background: #1e293b; color: #c084fc !important; }
+body.dark .btn-contact { background: #1e293b; color:#fff !important; }
+
+body.dark .glass-panel, body.dark .member-card, body.dark .artist-sidebar, body.dark .detail-photo-container, body.dark .video-card {
+  background: var(--glass-bg) !important; border-color: rgba(255,255,255,0.06) !important; color: var(--text-main);
+}
+body.dark .hero-info-card { background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255,255,255,0.06); color: var(--text-main); }
+body.dark .chat-board-container { background: #f3e8d7 !important; }
+
+/* Dark Text & Inputs */
+body.dark h1, body.dark h2, body.dark h3, body.dark h4, body.dark h5, body.dark h6 { color: #f3f4f6; }
+body.dark .text-dark { color: var(--text-main) !important; }
+body.dark .text-muted { color: var(--text-muted) !important; }
+body.dark .bg-white { background: #1e293b !important; }
+
+/* Artist & List */
+body.dark #artistList { background-color: rgba(255, 255, 255, 0.03) !important; border: 1px solid rgba(255, 255, 255, 0.1); color: #f5f6fa !important; }
+body.dark .filter-chip { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); color: #9ca3af; }
+body.dark .filter-chip.active { background: linear-gradient(135deg, #60a5fa, #c084fc) !important; color: #fff !important; }
+body.dark .artist-group-header { background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent) !important; color: #fff !important; border-left-color: #60a5fa; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+body.dark .artist-btn { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; box-shadow: none !important; }
+body.dark .artist-btn:hover { background: rgba(255, 255, 255, 0.12) !important; }
+body.dark .artist-name, body.dark .artist-btn .artist-name { color: #f3f4f6 !important; }
+body.dark .artist-info-sm { color: #9ca3af !important; }
+body.dark .artist-btn.active { background: rgba(96, 165, 250, 0.2) !important; border: 1px solid #60a5fa !important; }
+
+/* Detail */
+body.dark .detail-photo-inner { background: #0f172a; }
+body.dark .detail-photo-overlay { background: rgba(30, 41, 59, 0.85); border-color: rgba(255,255,255,0.06); }
+body.dark #dBio, body.dark #dBio * { background: transparent !important; color: #e5e7eb !important; }
+body.dark #dName, body.dark #dGenre, body.dark #dApple, body.dark #dYoutube { color: #f3f4f6 !important; }
+
+/* Gossip */
+body.dark .post-it { background: #111319; }
+body.dark .post-it div, body.dark .post-it span, body.dark .post-it p, body.dark .post-it li { color: #000 !important; }
+body.dark #summary-container h6, body.dark #summary-container div, body.dark #summary-container span, body.dark #summary-container p, body.dark #summary-container ul, body.dark #summary-container li { color: #000 !important; }
+
+/* 🌙 Dark Mode Global Radio (อวกาศเข้ม) */
+body.dark .radio-panel {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6) !important;
+}
+body.dark .radio-panel::after {
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.15) 0%, transparent 60%);
+}
+body.dark .radio-item {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #e2e8f0 !important;
+}
+body.dark .radio-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+}
+body.dark .radio-item.active {
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.3), rgba(30, 58, 138, 0.3)) !important;
+  border: 1px solid #60a5fa !important;
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+}
+body.dark .radio-item.active .badge { background: #60a5fa !important; color: #fff !important; }
+body.dark .globe-container { background: #020617 !important; box-shadow: 0 0 60px rgba(96, 165, 250, 0.4), inset 0 0 80px rgba(0,0,0,0.8) !important; }
+body.dark #radio-station-name, body.dark #radio-country { color: #f3f4f6 !important; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+body.dark .radio-panel h2 { color: #f3f4f6 !important; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+body.dark #btn-radio-play { border-color: rgba(96, 165, 250, 0.5) !important; color: #3b82f6 !important; }
+body.dark #btn-radio-prev, body.dark #btn-radio-next { border-color: rgba(255,255,255,0.2) !important; color: rgba(255,255,255,0.7) !important; }
+
+/* Footer */
+body.dark footer, body.dark footer.bg-white { background: #0f172a !important; border-top: 1px solid rgba(255,255,255,0.1) !important; }
+body.dark footer :is(p, h5, li, a, small, .text-muted, strong, .row, .col-lg-4, .col-md-6) { color: #e2e8f0 !important; }
+body.dark footer h5, body.dark footer strong { color: #ffffff !important; }
+body.dark footer a:hover { color: #60a5fa !important; }
+body.dark footer hr { background: linear-gradient(to right, #60a5fa, #c084fc) !important; }
+body.dark footer .row p, body.dark footer .row li, body.dark footer .row a, body.dark footer .row h5, body.dark footer .row strong, body.dark footer .row small, body.dark footer .row .text-muted { color: #111 !important; }
+body.dark footer hr + div, body.dark footer hr + div * { color: #fff !important; }
+
+/* --- Fixes & Upgrades --- */
+
+/* Hero Name Color (Force White in Dark Mode) */
+body.dark #hero-name { color: #ffffff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+body.dark .hero-highlight { color: #ffffff !important; text-shadow: 0 0 15px var(--primary), 0 0 30px var(--secondary); }
+
+/* Dark Mode Search */
+body.dark #artistSearch { background-color: #1e293b !important; color: #ffffff !important; border-color: rgba(255, 255, 255, 0.2) !important; }
+body.dark #artistSearch::placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+body.dark .bi-search { color: rgba(255, 255, 255, 0.5) !important; }
+body.dark #btnSortAZ { background-color: #1e293b !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.2); }
+body.dark #btnSortAZ:hover, body.dark #btnSortAZ.active { background-color: var(--primary) !important; border-color: var(--primary) !important; }
+
+/* Dark Mode Fan Zone Inputs */
+body.dark #chat-name, body.dark #chat-input {
+  background-color: rgba(255, 255, 255, 0.1) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+body.dark #chat-name::placeholder, body.dark #chat-input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important; opacity: 1;
+}
+
+/* Dark Mode AI Guru */
+body.dark .ai-guru-container {
+  background-image: linear-gradient(#15171e, #15171e), linear-gradient(135deg, #a78bfa, #fb7185) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6) !important; color: var(--text-main);
+}
+body.dark .ai-cat-avatar { border-color: #1f222b; }
+body.dark .ai-chat-box { background: rgba(0, 0, 0, 0.25) !important; border-color: rgba(255,255,255,0.05) !important; color: var(--text-main); }
+body.dark .ai-input-group input { background: #0f1115 !important; border-color: #2a2f3a !important; color: #fff !important; }
+body.dark .ai-input-group input:focus { border-color: #a78bfa !important; box-shadow: 0 0 0 5px rgba(167, 139, 250, 0.25); }
+
+/* Responsive */
+@media (max-width: 768px) {
+   .hero-profile-container { min-height: 350px; }
+   .section-title { font-size: 2.2rem; }
+   .globe-container { width: 240px; height: 240px; }
+}
+/* =========================================
+   FIX: Radio Text Color (FORCE BLACK in Light Mode)
+   ========================================= */
+
+/* 1. แก้หัวข้อ "Music Stations" และปุ่ม Filter ด้านบน */
+body:not(.dark) .radio-panel .text-white-50,
+body:not(.dark) .radio-panel .text-white,
+body:not(.dark) .radio-panel h5 {
+    color: #000000 !important; /* บังคับเป็นสีดำ */
+    opacity: 1 !important;
+}
+
+body:not(.dark) #radio-filters .btn-outline-light {
+    color: #555 !important;
+    border-color: #ccc !important;
+}
+body:not(.dark) #radio-filters .btn-outline-light.active {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+    border-color: var(--primary) !important;
+}
+
+/* 2. แก้รายการสถานี (List Items) ให้ตัวหนังสือดำ */
+body:not(.dark) .radio-item {
+    color: #000000 !important; /* สีดำ */
+    background: rgba(255, 255, 255, 0.8) !important; /* พื้นหลังขาวขุ่น */
+    border: 1px solid rgba(0,0,0,0.1) !important;
+}
+
+/* ชื่อสถานี (ตัวหนา) */
+body:not(.dark) .radio-item .fw-bold {
+    color: #000000 !important;
+}
+
+/* ชื่อประเทศ (ตัวเล็ก) */
+body:not(.dark) .radio-item small {
+    color: #333333 !important; /* เทาเข้ม */
+}
+
+/* ไอคอน Play ด้านขวา */
+body:not(.dark) .radio-item i {
+    color: #555555 !important;
+}
+
+/* 3. ย้ำ! โหมดมืด (Dark Mode) ให้กลับมาขาวเหมือนเดิม */
+body.dark .radio-panel .text-white-50 { color: rgba(255,255,255,0.5) !important; }
+body.dark .radio-panel .text-white { color: #fff !important; }
+body.dark .radio-item { color: #fff !important; background: rgba(255,255,255,0.05) !important; }
+body.dark .radio-item .fw-bold { color: #fff !important; }
+body.dark .radio-item small { color: #ccc !important; }
