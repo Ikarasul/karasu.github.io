@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
      const btnSend = document.getElementById('btn-ask-ai');
      
      // 🔴🔴 ใส่ API Key ของคุณที่นี่ 🔴🔴
-     const apiKey = "AIzaSyCxrKqSMPJazOAFQyM3AdY3DNo9BtoSuDk"; 
+     const apiKey = "AIzaSyAtalhKPaE8KY8iwPK1jmfyytOOb0g2rs4"; 
   
      if(btnSend && userInput && chatBox) {
         const addMessage = (text, isUser = false) => {
@@ -901,6 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
   })();
+
 
 
 
