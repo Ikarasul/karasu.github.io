@@ -29,6 +29,11 @@
 * **Libraries & APIs:** Three.js (3D Graphics), Gemini API (AI Integration), Google Apps Script (Database), and Animate.css.
 
 ---
+
+Web
+https://ikarasul.github.io/karasu.github.io/
+
+---
 ### 📺 Project Demo (วิดีโอสาธิตการใช้งาน)
 https://github.com/user-attachments/assets/db94b1af-f683-4303-9e8a-f20c5c66f2dc
 
