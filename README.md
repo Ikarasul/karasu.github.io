@@ -10,16 +10,22 @@
 
 ---
 
+### 📺 Project Demo (วิดีโอสาธิตการใช้งาน)
+สามารถรับชมวิดีโอพรีเซนต์ระบบและการทำงานทั้งหมดได้ที่ลิงก์ด้านล่างนี้:
+👉 **[Watch ArtistHub Demo Video](https://drive.google.com/file/d/10SVFYkHSzN0w7xWn0-b3G0JAgBZYdPXg/view?usp=sharing)**
+
+---
+
 ### 🚀 Key Features (ฟีเจอร์เด่น)
 
 * 🤖 **AI-Powered Workflow:** Developed using AI tools for smarter coding & debugging. / พัฒนาโดยใช้เครื่องมือ AI ช่วยในการเขียนโครงสร้างโค้ดและแก้ปัญหา.
 * ✨ **Interactive UI:** Glassmorphism design with 3D particle animations that react to mouse movement. / ดีไซน์ล้ำสมัยสไตล์ Glassmorphism พร้อมพื้นหลัง 3D Particles ที่ตอบสนองต่อเมาส์.
 * 🐱 **AI Guru (MeowGuru):** Chat with an AI character for music and concert recommendations, powered by the **Gemini API**. / ระบบแชทอัจฉริยะกับ "น้องแมว AI" เพื่อขอคำแนะนำเพลงและคอนเสิร์ตผ่าน Gemini API.
 * 🌍 **Global Radio:** Tune in to music stations worldwide via a **3D Interactive Globe**. / ฟีเจอร์ฟังสถานีวิทยุจากทั่วโลกผ่านลูกโลก 3D ที่สามารถหมุนและเลือกประเทศได้จริง.
-* 📌 **Fan Zone (Community Space):** A real-time message board using **Google Sheets** as a database. / กระดานข้อความแบบ Real-time ที่ใช้ Google Sheets ในการเก็บข้อมูล.
-    * **Post-it Style UI:** Randomized colors and rotations for a creative look. / แสดงผลแบบแผ่นโน้ตสุ่มสีและการวาง.
-    * **Auto-Refresh:** Automatically fetches new messages every 9 seconds. / ระบบดึงข้อมูลใหม่อัตโนมัติทุก 9 วินาที.
-    * **Profanity Filter:** Includes a system to filter unsafe content. / มีระบบกรองคำไม่สุภาพเพื่อความปลอดภัย.
+* 📌 **Fan Zone (Community Space):** A real-time message board using **Google Sheets** as a database.
+    * **Post-it Style UI:** Randomized colors and rotations for a creative look.
+    * **Auto-Refresh:** Automatically fetches new messages every 9 seconds.
+    * **Profanity Filter:** Includes a system to filter unsafe content.
 * 🌗 **Dynamic Theme:** Full support for Light and Dark modes with automatic asset updates. / รองรับการสลับโหมดสว่างและโหมดมืด พร้อมเปลี่ยนโลโก้และรูปภาพตามโหมดอัตโนมัติ.
 
 ---
@@ -31,17 +37,3 @@
 
 ---
 
-### 👥 Contributors (คณะผู้จัดทำ)
-
-| Student ID | Name (TH) | Name (EN) |
-| :--- | :--- | :--- |
-| 68046786 | ศุภวิชญ์ แซ่อิ๋ว | Supawit Saaeiw |
-| 68060424 | ศตรายุ กรึงชัง | Satarayu Kruengchung |
-| 68060455 | พชรดนัย เพียรทำดี | Phatcharadanai Piantamdee |
-| 68067967 | ราเวิน ไดลัน อาร์เนสัน | Raven Dylan Arneson |
-| 68062664 | ศุภาพิชญ์ บุหรั่นฉาย | Supapich Burunchai |
-| 68050800 | ภาคิน พงศ์มั่นจิน | Pakin Pongmanjin |
-
-<video autoplay muted loop style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -1; object-fit: cover;">
-  <source src="https://drive.google.com/uc?export=download&id=10SVFYkHSzN0w7xWn0-b3G0JAgBZYdPXg" type="video/mp4">
-</video>
