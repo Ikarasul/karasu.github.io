@@ -30,5 +30,5 @@
 
 ---
 ### 📺 Project Demo (วิดีโอสาธิตการใช้งาน)
-https://github.com/Ikarasul/karasu.github.io/issues/1#issue-3853399803
+https://github.com/user-attachments/assets/db94b1af-f683-4303-9e8a-f20c5c66f2dc
 
