@@ -31,8 +31,13 @@
 
 ---
 
-### 📦 Running the Project
+### 👥 Contributors (คณะผู้จัดทำ)
 
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/Ikarasul/ArtistHub.git](https://github.com/Ikarasul/ArtistHub.git)
+| Student ID | Name (TH) | Name (EN) |
+| :--- | :--- | :--- |
+| 68046786 | ศุภวิชญ์ แซ่อิ๋ว | Supawit Saaeiw |
+| 68060424 | ศตรายุ กรึงชัง | Satarayu Kruengchung |
+| 68060455 | พชรดนัย เพียรทำดี | Phatcharadanai Piantamdee |
+| 68067967 | ราเวิน ไดลัน อาร์เนสัน | Raven Dylan Arneson |
+| 68062664 | ศุภาพิชญ์ บุหรั่นฉาย | Supapich Burunchai |
+| 68050800 | ภาคิน พงศ์มั่นจิน | Pakin Pongmanjin |
