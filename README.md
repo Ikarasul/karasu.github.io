@@ -7,13 +7,6 @@
 **ArtistHub** is a web application project developed for **ICT12267 (Web Application Development)** at **Sripatum University**. The core objective of this project is to practice **AI-Assisted Development**, utilizing AI tools as a co-pilot to enhance coding efficiency, creativity, and UI design.
 
 **ArtistHub** เป็นโปรเจกต์เว็บแอปพลิเคชันที่พัฒนาขึ้นสำหรับวิชา **ICT12267 (การพัฒนาเว็บแอปพลิเคชัน)** มหาวิทยาลัยศรีปทุม. โดยมีเป้าหมายหลักคือการฝึกฝนทักษะการใช้ **AI เป็นเครื่องมือช่วยพัฒนา (AI-Assisted Development)** เพื่อเพิ่มประสิทธิภาพในการเขียนโค้ด การออกแบบ และการแก้ปัญหาอย่างเป็นระบบ.
-
----
-
-### 📺 Project Demo (วิดีโอสาธิตการใช้งาน)
-สามารถรับชมวิดีโอพรีเซนต์ระบบและการทำงานทั้งหมดได้ที่ลิงก์ด้านล่างนี้:
-👉 **[Watch ArtistHub Demo Video](https://drive.google.com/file/d/10SVFYkHSzN0w7xWn0-b3G0JAgBZYdPXg/view?usp=sharing)**
-
 ---
 
 ### 🚀 Key Features (ฟีเจอร์เด่น)
@@ -36,4 +29,7 @@
 * **Libraries & APIs:** Three.js (3D Graphics), Gemini API (AI Integration), Google Apps Script (Database), and Animate.css.
 
 ---
+### 📺 Project Demo (วิดีโอสาธิตการใช้งาน)
+สามารถรับชมวิดีโอพรีเซนต์ระบบและการทำงานทั้งหมดได้ที่ลิงก์ด้านล่างนี้:
+👉 **[Watch ArtistHub Demo Video](https://drive.google.com/file/d/10SVFYkHSzN0w7xWn0-b3G0JAgBZYdPXg/view?usp=sharing)**
 
