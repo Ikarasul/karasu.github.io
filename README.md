@@ -30,6 +30,5 @@
 
 ---
 ### 📺 Project Demo (วิดีโอสาธิตการใช้งาน)
-สามารถรับชมวิดีโอพรีเซนต์ระบบและการทำงานทั้งหมดได้ที่ลิงก์ด้านล่างนี้:
-👉 **[Watch ArtistHub Demo Video](https://drive.google.com/file/d/10SVFYkHSzN0w7xWn0-b3G0JAgBZYdPXg/view?usp=sharing)**
+https://github.com/Ikarasul/karasu.github.io/issues/1#issue-3853399803
 
