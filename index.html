@@ -48,7 +48,7 @@
           <li class="nav-item"><a class="nav-link nav-tab" href="#artists">ศิลปิน</a></li>
           <li class="nav-item"><a class="nav-link nav-tab" href="#ai-guru">AI Guru</a></li>
           <li class="nav-item"><a class="nav-link nav-tab" href="#submit">เสนอรายชื่อ</a></li>
-          <li class="nav-item"><a class="nav-link nav-tab" href="#members">ผู้จัดทำ</a></li>
+          <li class="nav-item d-none"><a class="nav-link nav-tab" href="#members">ผู้จัดทำ</a></li>
         </ul>
       </div>
     </div>
@@ -435,12 +435,13 @@
               </p>
             </div>
             <div class="ai-input-group mt-4">
-              <input type="text" id="ai-user-input" placeholder="เช่น 'เศร้ามากโดนเท', 'ดีใจสอบผ่านแล้ว'..."
-                class="shadow-sm">
-              <button id="btn-ask-ai" class="btn-ai-send shadow-sm ms-2">
+              <input type="text" id="ai-user-input" placeholder="เช่น 'เศร้ามาก', 'ดีใจสอบผ่าน', 'อยากฟังเพลงผ่อนคลาย'..."
+                class="shadow-sm" maxlength="200">
+              <button id="btn-ask-ai" class="btn-ai-send shadow-sm ms-2" aria-label="ส่ง">
                 <i class="bi bi-send-fill fs-5"></i>
               </button>
             </div>
+            <div class="char-counter px-2">0 / 200</div>
           </div>
         </div>
       </div>
@@ -584,7 +585,7 @@
     </div>
   </section>
 
-  <section id="members" class="py-5 reveal">
+  <section id="members" class="py-5 reveal d-none">
     <div class="container">
       <div class="glass-panel p-5 text-center">
         <h2 class="fw-bold mb-5 section-title" data-text="คณะผู้จัดทำ">คณะผู้จัดทำ</h2>
@@ -665,7 +666,7 @@
             <li><a href="#artists"><i class="bi bi-chevron-right me-1"></i> ศิลปินแนะนำ</a></li>
             <li><a href="#ai-guru"><i class="bi bi-chevron-right me-1"></i> AI Guru</a></li>
             <li><a href="#submit"><i class="bi bi-chevron-right me-1"></i> เสนอรายชื่อ</a></li>
-            <li><a href="#members"><i class="bi bi-chevron-right me-1"></i> คณะผู้จัดทำ</a></li>
+            <li class="d-none"><a href="#members"><i class="bi bi-chevron-right me-1"></i> คณะผู้จัดทำ</a></li>
           </ul>
         </div>
       </div>
@@ -681,7 +682,7 @@
                 <span class="muted">มหาวิทยาลัยศรีปทุม (SPU)</span>
               </div>
             </li>
-            <li class="d-flex align-items-start mt-2">
+            <li class="d-flex align-items-start mt-2 d-none">
               <i class="bi bi-journal-code me-2 text-secondary"></i>
               <div>
                 <strong class="ink">วิชา: ICT12267</strong><br>
