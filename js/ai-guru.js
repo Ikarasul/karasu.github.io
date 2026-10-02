@@ -8,48 +8,78 @@
 
     // 🔴🔴 ใส่ API Key ของคุณที่นี่ 🔴🔴
     const apiKey = "AIzaSyBW6AL8bM4KriJjdsEzfkNLwoVg59c25NY";
+    const MAX_CHARS = 200;
 
-    if (btnSend && userInput && chatBox) {
-        const addMessage = (text, isUser = false) => {
-            const p = document.createElement('p');
-            p.className = isUser ? 'text-end mt-3' : 'text-start mt-3';
-            const span = document.createElement('span');
-            span.className = isUser ?
-                'd-inline-block p-3 rounded-3 bg-primary text-white shadow-sm' :
-                'd-inline-block p-3 rounded-3 bg-white border border-light text-dark shadow-sm';
+    if (!btnSend || !userInput || !chatBox) return;
 
-            span.innerHTML = isUser ? text : marked.parse(text);
-
-            if (!isUser) {
-                span.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
+    // Character counter
+    const counterEl = document.querySelector('.char-counter');
+    if (counterEl && userInput) {
+        userInput.addEventListener('input', () => {
+            const len = userInput.value.length;
+            if (counterEl) {
+                counterEl.textContent = `${len} / ${MAX_CHARS}`;
+                counterEl.classList.toggle('warning', len > MAX_CHARS * 0.8);
+                counterEl.classList.toggle('danger', len > MAX_CHARS);
             }
+        });
+    }
 
-            p.appendChild(span);
-            chatBox.appendChild(p);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        };
+    const scrollToBottom = () => {
+        chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+    };
 
-        const callGemini = async (prompt) => {
-            const loadingId = 'loading-' + Date.now();
-            const loadingHtml = `<span id="${loadingId}" class="typing-indicator"><i class="bi bi-three-dots-vertical"></i> น้องแมวกำลังคิด... 🐾</span>`;
-            addMessage(loadingHtml);
+    const addMessage = (html, isUser = false) => {
+        const wrapper = document.createElement('p');
+        wrapper.className = isUser ? 'text-end mt-3 mb-1' : 'text-start mt-3 mb-1';
 
-            if (!apiKey || apiKey.includes("ใส่_API")) {
-                setTimeout(() => {
-                    document.getElementById(loadingId)?.closest('p')?.remove();
-                    addMessage(`<strong>⚠️ กรุณาใส่ API Key ในโค้ด script.js ก่อนใช้งานเมี๊ยว!</strong>`);
-                }, 1500);
-                return;
-            }
+        const bubble = document.createElement('span');
+        bubble.className = isUser ? 'chat-bubble-user' : 'chat-bubble-ai';
+        bubble.innerHTML = isUser ? html : marked.parse(html);
 
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: `Role: You are 'MeowGuru', a cute cat DJ and concert guide 🐱🎧.
+        if (!isUser) {
+            bubble.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
+        }
+
+        wrapper.appendChild(bubble);
+        chatBox.appendChild(wrapper);
+        scrollToBottom();
+        return wrapper;
+    };
+
+    const showTyping = () => {
+        const wrapper = document.createElement('p');
+        wrapper.className = 'text-start mt-3 mb-1 typing-msg';
+
+        const bubble = document.createElement('span');
+        bubble.className = 'chat-bubble-ai';
+        bubble.innerHTML = `<span class="typing-dots"><span></span><span></span><span></span></span>`;
+
+        wrapper.appendChild(bubble);
+        chatBox.appendChild(wrapper);
+        scrollToBottom();
+        return wrapper;
+    };
+
+    const callGemini = async (prompt) => {
+        const typingEl = showTyping();
+
+        if (!apiKey || apiKey.includes('ใส่_API')) {
+            setTimeout(() => {
+                typingEl.remove();
+                addMessage('⚠️ กรุณาใส่ API Key ในโค้ด js/ai-guru.js ก่อนใช้งานเมี๊ยว!');
+            }, 1000);
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `Role: You are 'MeowGuru', a cute cat DJ and concert guide 🐱🎧.
 User Input: "${prompt}"
 
 Instructions:
@@ -61,31 +91,38 @@ Instructions:
    - Add a short 1-line description for each song.
    - Recommend 1 Concert or Artist known for great live shows.
    - Use cute emojis! Keep it concise.`
-                            }]
                         }]
-                    })
-                });
+                    }]
+                })
+            });
 
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message || "API Error");
-                const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            const data = await response.json();
+            if (data.error) throw new Error(data.error.message || 'API Error');
+            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-                document.getElementById(loadingId)?.closest('p')?.remove();
-                if (aiText) addMessage(aiText);
-                else addMessage("ขออภัยเมี๊ยว... ระบบขัดข้องชั่วคราว 😿");
-            } catch (error) {
-                document.getElementById(loadingId)?.closest('p')?.remove();
-                addMessage(`ขออภัยเมี๊ยว... เกิดข้อผิดพลาด: ${error.message} 😿`);
-            }
-        };
+            typingEl.remove();
+            if (aiText) addMessage(aiText);
+            else addMessage('ขออภัยเมี๊ยว... ระบบขัดข้องชั่วคราว 😿');
+        } catch (error) {
+            typingEl.remove();
+            addMessage(`ขออภัยเมี๊ยว... เกิดข้อผิดพลาด: ${error.message} 😿`);
+        }
+    };
 
-        btnSend.addEventListener('click', () => {
-            const text = userInput.value.trim();
-            if (!text) return;
-            addMessage(text, true);
-            userInput.value = '';
-            callGemini(text);
-        });
-        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnSend.click(); });
-    }
+    const handleSend = () => {
+        const text = userInput.value.trim();
+        if (!text || text.length > MAX_CHARS) return;
+        addMessage(text, true);
+        userInput.value = '';
+        if (counterEl) counterEl.textContent = `0 / ${MAX_CHARS}`;
+        callGemini(text);
+    };
+
+    btnSend.addEventListener('click', handleSend);
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    });
 })();
