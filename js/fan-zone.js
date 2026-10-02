@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const GVIZ_URL      = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
     // Apps Script URL ยังใช้สำหรับ POST (เขียนข้อมูล)
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHB8xqMQpBCcLiP-KwL0dBnl8kLOFLF_kOXE981oI19_9s4mIusPAwpgXHi51pVuaA/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxrR1iUuthMPyU_jgPfJo9aa1a2i_nNREo7h4W8KY89QQLO5nt2-Qay8EmwNnqZN76I/exec';
 
     const chatContainer = document.getElementById('chat-messages');
     const chatForm      = document.getElementById('chat-form');

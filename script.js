@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSend = document.getElementById('btn-ask-ai');
 
     // 🔴🔴 ใส่ API Key ของคุณที่นี่ 🔴🔴
-    const apiKey = "AQ.Ab8RN6J4Zef-o0H4y2Zw8aG5vUK2che-62KAhNyIvzNIGTdfFQ";
+    const apiKey = "AQ.Ab8RN6Jbgwl0tt65eDq-9qrBEGMpCLOf-D0crylfTXktnovnBA";
 
     if (btnSend && userInput && chatBox) {
         const addMessage = (text, isUser = false) => {
@@ -462,17 +462,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const isBearer = !apiKey.startsWith('AIza');
-                const url = isBearer ? 
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent` :
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                
-                const headers = { 'Content-Type': 'application/json' };
-                if (isBearer) headers['Authorization'] = `Bearer ${apiKey}`;
-
-                const response = await fetch(url, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
-                    headers: headers,
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
                             parts: [{

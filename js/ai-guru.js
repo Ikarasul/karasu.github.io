@@ -7,7 +7,7 @@
     const btnSend = document.getElementById('btn-ask-ai');
 
     // 🔴🔴 ใส่ API Key ของคุณที่นี่ 🔴🔴
-    const apiKey = "AIzaSyBW6AL8bM4KriJjdsEzfkNLwoVg59c25NY";
+    const apiKey = "AQ.Ab8RN6Jbgwl0tt65eDq-9qrBEGMpCLOf-D0crylfTXktnovnBA";
     const MAX_CHARS = 200;
 
     if (!btnSend || !userInput || !chatBox) return;
@@ -73,7 +73,7 @@
         }
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
